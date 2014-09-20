@@ -1,6 +1,7 @@
 var cheerio = require('cheerio');
 var request = require('request');
 var http = require('http');
+var fs = require('fs');
 var express = require('express');
 
 /* app */
@@ -17,6 +18,7 @@ var options = {
 
 app.param('region', function(req,res,next,id){
   if (req.params.region == 'kr') {req.params.region = 'www';}
+  options.region = req.params.region;
   next();
 });
 
@@ -32,7 +34,7 @@ app.param('summoner', function(req,res,next,id){
   next();
 });
 
-app.get('/:region/:summoner', function(req,_res) {
+app.get('/:region/summoner/:summoner', function(req,_res) {
   _res.set('Content-Type', 'application/json');
   res = _res;
   options.url = 'http://'+req.params.region+'.op.gg/summoner/userName='+req.params.summoner;
@@ -40,7 +42,7 @@ app.get('/:region/:summoner', function(req,_res) {
   request(options,parseSummoner);
 });
 
-app.get('/:region/:summoner/champions', function(req,_res) {
+app.get('/:region/summoner/:summoner/champions', function(req,_res) {
   _res.set('Content-Type', 'application/json');
   res = _res;
   options.url = 'http://'+req.params.region+'.op.gg/summoner/champions/userName='+req.params.summoner;
@@ -48,7 +50,7 @@ app.get('/:region/:summoner/champions', function(req,_res) {
   request(options,parseSummonerChampions);
 });
 
-app.get('/:region/:summoner/league', function(req,_res) {
+app.get('/:region/summoner/:summoner/league', function(req,_res) {
   _res.set('Content-Type', 'application/json');
   res = _res;
   options.url = 'http://'+req.params.region+'.op.gg/summoner/league/userName='+req.params.summoner;
@@ -56,12 +58,26 @@ app.get('/:region/:summoner/league', function(req,_res) {
   request(options,parseSummonerLeague);
 });
 
-app.get('/:region/league/top', function(req,_res) {
+app.get('/:region/league', function(req,_res) {
   _res.set('Content-Type', 'application/json');
   res = _res;
   options.url = 'http://'+req.params.region+'.op.gg/ranking/ladder';
   console.log("parsing "+options.url);
   request(options,parseLeague);
+});
+
+app.param('gamenum', function(req,res,next,id) {
+	options.gamenum = req.params.gamenum;
+	next();
+});
+
+app.get('/:region/spectate/download/:gamenum', function(req,_res) {
+	_res.set('Content-Type', 'text/html');
+	res = _res;
+	options.url = 'http://'+req.params.region+'.op.gg/match/observer/id='+req.params.gamenum;
+	console.log("parsing "+options.url);
+	var rem = request(options).pipe(res);
+	console.log("done");
 });
 
 http.createServer(app).listen(1337, function() {
