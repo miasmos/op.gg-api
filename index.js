@@ -88,6 +88,7 @@ function parseLive(err, resp, html) {
       summoner.name = stripNewLines($('.summonerName').text());
       summoner.rank = stripNewLines($('.TierRankString').text());
       summoner.team = stripNewLines($('.summonerTeam').text());
+      summoner.alias = stripNewLines($('.summonerExtra').text());
       ret.push(summoner);
     });
   });
