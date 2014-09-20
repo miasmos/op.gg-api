@@ -1,4 +1,4 @@
 op.gg-api
 =========
 
-Converts useful op.gg pages into json endpoints
+Converts live op.gg pages into json endpoints
