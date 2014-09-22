@@ -1,6 +1,6 @@
 var request = require('request');
 
-function gg(opts) {
+function opggClient(opts) {
   this.opts = {
     url: '',
     port: '1337',
@@ -14,7 +14,7 @@ function gg(opts) {
   if (typeof(opts.host) !== 'undefined') {this.opts.host = opts.host}
 }
 
-gg.prototype.request = function(url, callback) {
+opggClient.prototype.request = function(url, callback) {
   var options = this.opts;
   options.url = url;
 
@@ -23,34 +23,36 @@ gg.prototype.request = function(url, callback) {
   });
 }
 
-gg.prototype.Region = function(region, callback){
+/* Public Methods */
+opggClient.prototype.Region = function(region, callback){
   var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region;
   this.request(url,callback);
 }
 
-gg.prototype.Summoner = function(region, summoner, callback){
+opggClient.prototype.Summoner = function(region, summoner, callback){
   var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/summoner/'+summoner;
   this.request(url,callback);
 }
 
-gg.prototype.SummonerChampions = function(region, summoner, callback){
+opggClient.prototype.SummonerChampions = function(region, summoner, callback){
   var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/summoner/'+summoner+'/champions';
   this.request(url,callback);
 }
 
-gg.prototype.SummonerLeague = function(region, summoner, callback){
+opggClient.prototype.SummonerLeague = function(region, summoner, callback){
   var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/summoner/'+summoner+'/league';
   this.request(url,callback);
 }
 
-gg.prototype.League = function(region, callback){
+opggClient.prototype.League = function(region, callback){
   var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/league';
   this.request(url,callback);
 }
 
-gg.prototype.GetReplay = function(region, game, callback){
+opggClient.prototype.GetReplay = function(region, game, callback){
   var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/spectate/download/'+game;
   this.request(url,callback);
 }
+/* End Public Methods */
 
-module.exports = opgg;
+module.exports = opggClient;
