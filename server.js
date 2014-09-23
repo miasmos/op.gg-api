@@ -132,7 +132,7 @@ function parseLive(err, resp, html) {
   var $ = cheerio.load(html);
   var ret = {status:'ok'};
 
-  if (!err) {err = checkFor404(html);}
+  if (!err) {err = checkForError(html);}
   if (err) {
     ret.status = 'error';
     ret.error = error;
@@ -165,7 +165,7 @@ function parseSummoner(err, resp, html) {
   var $ = cheerio.load(html);
   var ret = {status:'ok'};
 
-  if (!err) {err = checkFor404(html);}
+  if (!err) {err = checkForError(html);}
   if (err) {
     ret.status = 'error';
     ret.error = err;
@@ -278,7 +278,7 @@ function parseSummonerChampions(err, resp, html) {
   var $ = cheerio.load(html);
   var ret = {status:'ok'};
 
-  if (!err) {err = checkFor404(html);}
+  if (!err) {err = checkForError(html);}
   if (err) {
     ret.status = 'error';
     ret.error = error;
@@ -313,7 +313,7 @@ function parseSpectateListPro(err, resp, html) {
   var $ = cheerio.load(html);
   var ret = {status:'ok'};
 
-  if (!err) {err = checkFor404(html);}
+  if (!err) {err = checkForError(html);}
   if (err) {
     ret.status = 'error';
     ret.error = error;
@@ -374,7 +374,7 @@ function parseSummonerLeague(err, resp, html) {
   var $ = cheerio.load(html);
     var ret = {status:'ok'};
 
-  if (!err) {err = checkFor404(html);}
+  if (!err) {err = checkForError(html);}
   if (err) {
     ret.status = 'error';
     res.send(ret);
@@ -465,7 +465,7 @@ function parseLeague(err, resp, html) {
   console.log('done');
 }
 
-function checkFor404(html) {
+function checkForError(html) {
   var $ = cheerio.load(html);
   if ($('.ErrorContainer').length) {return $('.ErrorContainer .message').eq(0).text();}
   return false;
