@@ -174,6 +174,7 @@ function parseSummoner(err, resp, html) {
   }
   
   ret.data = [];
+  ret.data[0] = {};
 
   var recent = {};
   recent.winRatio = parseInt($('.AverageGameStats .WinRatioText').text().slice(0,-1));
@@ -189,7 +190,7 @@ function parseSummoner(err, resp, html) {
   recent.kdaDeathsTotal = parseInt($('.AverageGameStats .kdatotal .death').text());
   recent.kdaAssistsTotal = parseInt($('.AverageGameStats .kdatotal .assist').text());
   recent.kdaRatio = parseFloat($('.AverageGameStats .kdaratio .kdaratio').text().slice(0,-2));
-  ret.data.recent = recent;
+  ret.data[0].recent = recent;
 
   var games = [];
   $('.GameBox').each(function(i,game) {
@@ -268,8 +269,9 @@ function parseSummoner(err, resp, html) {
 
     games.push(game);
   });
-  ret.data.games = games;
-  ret.data.gameCount = ret.data.games.length;
+  ret.data[0].games = games;
+  ret.data[0].gameCount = ret.data[0].games.length;
+  console.log(ret);
   res.send(ret);
   console.log('done');
 }
@@ -383,6 +385,8 @@ function parseSummonerLeague(err, resp, html) {
   }
     
   ret.data = [];
+  ret.data[0] = {};
+
   var league = {};
   league.image = stripNewLines($('.LeagueHeader img').attr('src'));
   league.rank = stripNewLines($('.LeagueHeader .LeagueRank').text());
@@ -404,8 +408,8 @@ function parseSummonerLeague(err, resp, html) {
     summoners.push(summoner);
   });
 
-  ret.data.league = league;
-  ret.data.summoners = summoners;
+  ret.data[0].league = league;
+  ret.data[0].summoners = summoners;
   res.send(ret);
   console.log('done');
 }
