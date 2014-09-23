@@ -22,7 +22,7 @@ app.param('region', function(req,res,next,id){
   next();
 });
 
-app.get('/:region', function(req,_res){
+app.get('/:region/live', function(req,_res){
   _res.set('Content-Type', 'application/json');
   res = _res;
   options.url = 'http://'+req.params.region+'.op.gg/spectate/pro/';

@@ -4,7 +4,7 @@ Converts live op.gg pages into json endpoints
 <br><br>
 Endpoints
 ==========
-/:region => http://:region.op.gg/spectate/pro/  
+/:region/live => http://:region.op.gg/spectate/pro/  
 Fetches pro players currently playing.
 
 /:region/pro => http://:region.op.gg/spectate/list  
@@ -25,7 +25,7 @@ Fetches the specified summoner's standing in their league as well as the top 200
 /:region/league => http://:region.op.gg/ranking/ladder  
 Fetches the top 200 players in the specified region.
 
-/:region/spectate/download/:gameID => http://:region.op.gg/match/observer/id=:gameID
+/:region/spectate/download/:gameID => http://:region.op.gg/match/observer/id=:gameID  
 Fetches the spectator bat file associated with the specified game ID
 <br>
 Dependencies

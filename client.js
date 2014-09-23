@@ -24,8 +24,8 @@ opggClient.prototype.request = function(url, callback) {
 }
 
 /* Public Methods */
-opggClient.prototype.Region = function(region, callback){
-  var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region;
+opggClient.prototype.Live = function(region, callback){
+  var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/live';
   this.request(url,callback);
 }
 
