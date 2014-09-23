@@ -19,7 +19,18 @@ opggClient.prototype.request = function(url, callback) {
   options.url = url;
 
   request(options, function(error, res, body) {
-    callback(JSON.parse(body));
+    if (error) {
+      console.log(error);
+      callback({'status':'error','error':error+' when connecting to op.gg-api server'});
+      return;
+    } else {
+      var json = JSON.parse(body);
+      if (typeof json.status === 'undefined') {
+        callback({'status':'error','error':'return was not json, wtf'});
+        return;
+      }
+      callback(json);
+    }
   });
 }
 

@@ -7,6 +7,7 @@ var fs = require('fs');
 /* app */
 var res;
 var app = express();
+var regions = ['kr','na','euw','eune','oce','br','ru','las','lan','tr'];
 var options = {
   url: '',
   headers: {
@@ -17,6 +18,10 @@ var options = {
 };
 
 app.param('region', function(req,res,next,id){
+  if (regions.indexOf(req.params.region) == -1) {
+    res.send({'status':'error','error':'invalid region'});
+    return;
+  }
   if (req.params.region == 'kr') {req.params.region = 'www';}
   options.region = req.params.region;
   next();
@@ -31,6 +36,10 @@ app.get('/:region/live', function(req,_res){
 });
 
 app.param('summoner', function(req,res,next,id){
+  if (req.params.summoner.length > 16 || req.params.summoner.length < 3) {
+    res.send({'status':'error','error':'invalid summoner name'});
+    return;
+  }
   next();
 });
 
@@ -67,6 +76,10 @@ app.get('/:region/league', function(req,_res) {
 });
 
 app.param('gamenum', function(req,res,next,id) {
+  if (req.params.gamenum % 1 !== 0 || parseInt(req.params.gamenum) < 1000000000) {
+    res.send({'status':'error','error':'invalid game number'});
+    return;
+  }
 	options.gamenum = req.params.gamenum;
 	next();
 });
@@ -94,6 +107,7 @@ app.get('/:region/spectate/download/:gamenum', function(req,_res) {
 	console.log("parsing "+options.url);
   var file = fs.createWriteStream('./'+req.params.gamenum+'.bat');
 	var rem = request(options).pipe(file);
+  res.send({status:'ok'});
 	console.log("done");
 });
 
@@ -106,9 +120,17 @@ http.createServer(app).listen(1337, function() {
 
 /* fetch */
 function parseLive(err, resp, html) {
-  if (err) {res.send('endpoint not found'); return console.error(err);}
   var $ = cheerio.load(html);
-  var ret = [];
+  var ret = {status:'ok'};
+
+  if (err) {
+    ret.status = 'error';
+    ret.error = error;
+    res.send(ret);
+    return console.error(err);
+  }
+  
+  ret.data = [];
 
   $('div.nBoxContent').each(function(i,item0) {
     $('div.SpectatorSummoner').each(function(j,item1){
@@ -122,7 +144,7 @@ function parseLive(err, resp, html) {
       summoner.rank = stripNewLines($('.TierRankString').text());
       summoner.team = stripNewLines($('.summonerTeam').text());
       summoner.alias = stripNewLines($('.summonerExtra').text());
-      ret.push(summoner);
+      ret.data.push(summoner);
     });
   });
   res.send(ret);
@@ -130,9 +152,17 @@ function parseLive(err, resp, html) {
 }
 
 function parseSummoner(err, resp, html) {
-  if (err) {res.send('endpoint not found'); return console.error(err);}
   var $ = cheerio.load(html);
-  var ret = {};
+  var ret = {status:'ok'};
+
+  if (err) {
+    ret.status = 'error';
+    ret.error = error;
+    res.send(ret);
+    return console.error(err);
+  }
+  
+  ret.data = [];
 
   var recent = {};
   recent.winRatio = parseInt($('.AverageGameStats .WinRatioText').text().slice(0,-1));
@@ -148,7 +178,7 @@ function parseSummoner(err, resp, html) {
   recent.kdaDeathsTotal = parseInt($('.AverageGameStats .kdatotal .death').text());
   recent.kdaAssistsTotal = parseInt($('.AverageGameStats .kdatotal .assist').text());
   recent.kdaRatio = parseFloat($('.AverageGameStats .kdaratio .kdaratio').text().slice(0,-2));
-  ret.recent = recent;
+  ret.data.recent = recent;
 
   var games = [];
   $('.GameBox').each(function(i,game) {
@@ -227,17 +257,24 @@ function parseSummoner(err, resp, html) {
 
     games.push(game);
   });
-  ret.games = games;
-  ret.gameCount = ret.games.length;
+  ret.data.games = games;
+  ret.data.gameCount = ret.data.games.length;
   res.send(ret);
   console.log('done');
 }
 
 function parseSummonerChampions(err, resp, html) {
-  if (err) {res.send('endpoint not found'); return console.error(err);}
   var $ = cheerio.load(html);
-  var ret = [];
+  var ret = {status:'ok'};
 
+  if (err) {
+    ret.status = 'error';
+    ret.error = error;
+    res.send(ret);
+    return console.error(err);
+  }
+  
+  ret.data = [];
   $('.ChampionsStatsTable .ChampionStatsTr').each(function(i,item) {
     var $ = cheerio.load(item);
     summoner = {};
@@ -252,18 +289,26 @@ function parseSummonerChampions(err, resp, html) {
     summoner.cs = parseInt(stripNewLines($('.cs').text()));
     summoner.gold = stripNewLines($('.gold').text());
     summoner.rank = i+1;
-    ret.push(summoner);
+    ret.data.push(summoner);
   });
+
   res.send(ret);
   console.log('done');
 }
 
 
 function parseSpectateListPro(err, resp, html) {
-  if (err) {res.send('endpoint not found'); return console.error(err);}
   var $ = cheerio.load(html);
-  var ret = [];
+  var ret = {status:'ok'};
 
+  if (err) {
+    ret.status = 'error';
+    ret.error = error;
+    res.send(ret);
+    return console.error(err);
+  }
+  
+  ret.data = [];
   $('.nContentLayout .SummonerSummary').each(function(i,item) {
     var $ = cheerio.load(item);
     summoner = {};
@@ -275,17 +320,25 @@ function parseSpectateListPro(err, resp, html) {
     summoner.alias = stripNewLines($('.extra').text());
     summoner.rank = stripNewLines($('.summonerTierRank .tierRank').text());
     summoner.lp = stripNewLines($('.tierRank').attr('original-title'));
-    ret.push(summoner);
+    ret.data.push(summoner);
   });
+
   res.send(ret);
   console.log('done');
 }
 
 function parseSpectateListAmateur(err, resp, html) {
-  if (err) {res.send('endpoint not found'); return console.error(err);}
   var $ = cheerio.load(html);
-  var ret = [];
+  var ret = {status:'ok'};
 
+  if (err) {
+    ret.status = 'error';
+    ret.error = error;
+    res.send(ret);
+    return console.error(err);
+  }
+  
+  ret.data = [];
   $('.nContentLayout .SummonerSummary').each(function(i,item) {
     var $ = cheerio.load(item);
     summoner = {};
@@ -297,17 +350,24 @@ function parseSpectateListAmateur(err, resp, html) {
     summoner.alias = stripNewLines($('.extra').text());
     summoner.rank = stripNewLines($('.summonerTierRank .tierRank').text());
     summoner.lp = stripNewLines($('.tierRank').attr('original-title'));
-    ret.push(summoner);
+    ret.data.push(summoner);
   });
+
   res.send(ret);
   console.log('done');
 }
 
 function parseSummonerLeague(err, resp, html) {
-  if (err) {res.send('endpoint not found'); return console.error(err);}
   var $ = cheerio.load(html);
-  var ret = {};
+    var ret = {status:'ok'};
 
+  if (err) {
+    ret.status = 'error';
+    res.send(ret);
+    return console.error(err);
+  }
+    
+  ret.data = [];
   var league = {};
   league.image = stripNewLines($('.LeagueHeader img').attr('src'));
   league.rank = stripNewLines($('.LeagueHeader .LeagueRank').text());
@@ -329,17 +389,24 @@ function parseSummonerLeague(err, resp, html) {
     summoners.push(summoner);
   });
 
-  ret.league = league;
-  ret.summoners = summoners;
+  ret.data.league = league;
+  ret.data.summoners = summoners;
   res.send(ret);
   console.log('done');
 }
 
 function parseLeague(err, resp, html) {
-  if (err) {res.send('endpoint not found'); return console.error(err);}
   var $ = cheerio.load(html);
-  var ret = [];
+  var ret = {status:'ok'};
 
+  if (err) {
+    ret.status = 'error';
+    ret.error = error;
+    res.send(ret);
+    return console.error(err);
+  }
+  
+  ret.data = [];
   $('.RankingTable tr').each(function(i,item) {
     var $ = cheerio.load(item);
     summoner = {};
@@ -377,7 +444,7 @@ function parseLeague(err, resp, html) {
       champions.push(champion);
     });
     summoner.champions = champions;
-    ret.push(summoner);
+    ret.data.push(summoner);
   });
 
   res.send(ret);
