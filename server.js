@@ -105,9 +105,18 @@ app.get('/:region/spectate/download/:gamenum', function(req,_res) {
 	res = _res;
 	options.url = 'http://'+req.params.region+'.op.gg/match/observer/id='+req.params.gamenum;
 	console.log("parsing "+options.url);
-  var file = fs.createWriteStream('./'+req.params.gamenum+'.bat');
-	var rem = request(options).pipe(file);
-  res.send({status:'ok'});
+
+	var rem = request(options);
+  rem.on('response', function(resp) {
+    if (resp.statusCode == '404' || resp.headers['content-type'].indexOf('text/html') > -1) {
+      res.send({status:'error', error: 'game file not found'});
+    } else {
+      var file = fs.createWriteStream('./replays/'+req.params.gamenum+'.bat');
+      rem.pipe(file);
+      res.send({status:'ok'});
+    }
+  });
+
 	console.log("done");
 });
 
@@ -123,6 +132,7 @@ function parseLive(err, resp, html) {
   var $ = cheerio.load(html);
   var ret = {status:'ok'};
 
+  if (!err) {err = checkFor404(html);}
   if (err) {
     ret.status = 'error';
     ret.error = error;
@@ -155,9 +165,10 @@ function parseSummoner(err, resp, html) {
   var $ = cheerio.load(html);
   var ret = {status:'ok'};
 
+  if (!err) {err = checkFor404(html);}
   if (err) {
     ret.status = 'error';
-    ret.error = error;
+    ret.error = err;
     res.send(ret);
     return console.error(err);
   }
@@ -267,6 +278,7 @@ function parseSummonerChampions(err, resp, html) {
   var $ = cheerio.load(html);
   var ret = {status:'ok'};
 
+  if (!err) {err = checkFor404(html);}
   if (err) {
     ret.status = 'error';
     ret.error = error;
@@ -301,6 +313,7 @@ function parseSpectateListPro(err, resp, html) {
   var $ = cheerio.load(html);
   var ret = {status:'ok'};
 
+  if (!err) {err = checkFor404(html);}
   if (err) {
     ret.status = 'error';
     ret.error = error;
@@ -361,6 +374,7 @@ function parseSummonerLeague(err, resp, html) {
   var $ = cheerio.load(html);
     var ret = {status:'ok'};
 
+  if (!err) {err = checkFor404(html);}
   if (err) {
     ret.status = 'error';
     res.send(ret);
@@ -449,6 +463,12 @@ function parseLeague(err, resp, html) {
 
   res.send(ret);
   console.log('done');
+}
+
+function checkFor404(html) {
+  var $ = cheerio.load(html);
+  if ($('.ErrorContainer').length) {return $('.ErrorContainer .message').eq(0).text();}
+  return false;
 }
 
 function stripNewLines(str) {

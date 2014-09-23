@@ -20,7 +20,6 @@ opggClient.prototype.request = function(url, callback) {
 
   request(options, function(error, res, body) {
     if (error) {
-      console.log(error);
       callback({'status':'error','error':error+' when connecting to op.gg-api server'});
       return;
     } else {
