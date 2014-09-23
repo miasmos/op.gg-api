@@ -344,6 +344,7 @@ function parseSpectateListAmateur(err, resp, html) {
   var $ = cheerio.load(html);
   var ret = {status:'ok'};
 
+  if (!err) {err = checkForError(html);}
   if (err) {
     ret.status = 'error';
     ret.error = error;
@@ -413,6 +414,7 @@ function parseLeague(err, resp, html) {
   var $ = cheerio.load(html);
   var ret = {status:'ok'};
 
+  if (!err) {err = checkForError(html);}
   if (err) {
     ret.status = 'error';
     ret.error = error;
