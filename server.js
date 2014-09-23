@@ -1,4 +1,6 @@
 var request = require('request');
+var express = require('express');
+var cheerio = require('cheerio');
 var http = require('http');
 var fs = require('fs');
 
@@ -67,6 +69,22 @@ app.get('/:region/league', function(req,_res) {
 app.param('gamenum', function(req,res,next,id) {
 	options.gamenum = req.params.gamenum;
 	next();
+});
+
+app.get('/:region/pro', function(req, _res) {
+  _res.set('Content-Type', 'application/json');
+  res = _res;
+  options.url = 'http://'+req.params.region+'.op.gg/spectate/list';
+  console.log("parsing "+options.url);
+  request(options,parseSpectateListPro); 
+});
+
+app.get('/:region/amateur', function(req, _res) {
+  _res.set('Content-Type', 'application/json');
+  res = _res;
+  options.url = 'http://'+req.params.region+'.op.gg/spectate/list';
+  console.log("parsing "+options.url);
+  request(options,parseSpectateListAmateur); 
 });
 
 app.get('/:region/spectate/download/:gamenum', function(req,_res) {
@@ -234,6 +252,51 @@ function parseSummonerChampions(err, resp, html) {
     summoner.cs = parseInt(stripNewLines($('.cs').text()));
     summoner.gold = stripNewLines($('.gold').text());
     summoner.rank = i+1;
+    ret.push(summoner);
+  });
+  res.send(ret);
+  console.log('done');
+}
+
+
+function parseSpectateListPro(err, resp, html) {
+  if (err) {res.send('endpoint not found'); return console.error(err);}
+  var $ = cheerio.load(html);
+  var ret = [];
+
+  $('.nContentLayout .SummonerSummary').each(function(i,item) {
+    var $ = cheerio.load(item);
+    summoner = {};
+    summoner.team = stripNewLines($('.summonerTeam').text());
+    if (summoner.team == 'Named') {
+      return false;
+    }
+    summoner.name = stripNewLines($('.summonerName').text());
+    summoner.alias = stripNewLines($('.extra').text());
+    summoner.rank = stripNewLines($('.summonerTierRank .tierRank').text());
+    summoner.lp = stripNewLines($('.tierRank').attr('original-title'));
+    ret.push(summoner);
+  });
+  res.send(ret);
+  console.log('done');
+}
+
+function parseSpectateListAmateur(err, resp, html) {
+  if (err) {res.send('endpoint not found'); return console.error(err);}
+  var $ = cheerio.load(html);
+  var ret = [];
+
+  $('.nContentLayout .SummonerSummary').each(function(i,item) {
+    var $ = cheerio.load(item);
+    summoner = {};
+    summoner.team = stripNewLines($('.summonerTeam').text());
+    if (summoner.team != 'Named') {
+      return true;
+    }
+    summoner.name = stripNewLines($('.summonerName').text());
+    summoner.alias = stripNewLines($('.extra').text());
+    summoner.rank = stripNewLines($('.summonerTierRank .tierRank').text());
+    summoner.lp = stripNewLines($('.tierRank').attr('original-title'));
     ret.push(summoner);
   });
   res.send(ret);

@@ -53,6 +53,16 @@ opggClient.prototype.GetReplay = function(region, game, callback){
   var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/spectate/download/'+game;
   this.request(url,callback);
 }
+
+opggClient.prototype.ProPlayers = function(region, callback){
+  var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/pro';
+  this.request(url,callback);
+}
+
+opggClient.prototype.AmateurPlayers = function(region, callback){
+  var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/amateur';
+  this.request(url,callback);
+}
 /* End Public Methods */
 
 module.exports = opggClient;
