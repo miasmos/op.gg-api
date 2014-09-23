@@ -108,7 +108,7 @@ app.get('/:region/spectate/download/:gamenum', function(req,_res) {
 
 	var rem = request(options);
   rem.on('response', function(resp) {
-    if (resp.statusCode == '404' || resp.headers['content-type'].indexOf('text/html') > -1) {
+    if (resp.statusCode != '200' || resp.headers['content-type'].indexOf('text/html') > -1) {
       res.send({status:'error', error: 'game file not found'});
     } else {
       var file = fs.createWriteStream('./replays/'+req.params.gamenum+'.bat');
