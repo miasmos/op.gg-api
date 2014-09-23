@@ -11,7 +11,7 @@ Fetches pro players currently playing.
 Fetches pro players registered with op.gg.
 
 /:region/amateur => http://:region.op.gg/spectate/list  
-Fetches amateur players register with op.gg.
+Fetches amateur players registered with op.gg.
 
 /:region/summoner/:summoner => http://:region.op.gg/summoner/userName=:summoner  
 Fetches the specified summoner's 15 most recent games data.
