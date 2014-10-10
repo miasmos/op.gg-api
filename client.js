@@ -11,7 +11,7 @@ function opggClient(opts) {
       'Accept-Language': 'en-GB,en-US;q=0.8,en;q=0.6'
     }
   };
-  if (typeof(opts.host) !== 'undefined') {this.opts.host = opts.host}
+  if (typeof opts !== 'undefined') {if (typeof(opts.host) !== 'undefined') {this.opts.host = opts.host}}
 }
 
 opggClient.prototype.request = function(url, callback) {

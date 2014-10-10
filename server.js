@@ -111,7 +111,7 @@ app.get('/:region/spectate/download/:gamenum', function(req,_res) {
     if (resp.statusCode != '200' || resp.headers['content-type'].indexOf('text/html') > -1) {
       res.send({status:'error', error: 'game file not found'});
     } else {
-      var file = fs.createWriteStream('./replays/'+req.params.gamenum+'.bat');
+      var file = fs.createWriteStream('../replays/'+req.params.gamenum+'.bat');
       rem.pipe(file);
       res.send({status:'ok'});
     }
@@ -194,14 +194,13 @@ function parseSummoner(err, resp, html) {
 
   var games = [];
   $('.GameBox').each(function(i,game) {
+    var temp;
     var $ = cheerio.load(game);
     game = {};
     game.type = stripNewLines($('.subType').contents().eq(0).text()).slice(0,-2);
     game.date = stripNewLines($('._timeago').data('data-datetime'));
     game.mmr = parseInt(stripNewLines($('.mmr').text()).substring(11));
     
-    var temp = stripURL($('.observer a').attr('href'));
-    game.id = temp.replace( /^\D+/g, '');
     game.length = stripNewLines($('.gameLength').text());
     game.result = stripNewLines($('.gameResult span').text());
     game.champion = stripNewLines($('.championName').text());
@@ -215,10 +214,18 @@ function parseSummoner(err, resp, html) {
     game.ratio = parseFloat(stripNewLines($('.kdaratio .kdaratio').text()).slice(0,-2));
     game.multikill = stripNewLines($('.multikill .kill').text());
     game.level = parseInt(stripNewLines($('.level .level').text()));
+    
+    if ($('.observer').length) {
+      temp = stripURL($('.observer a').attr('href'));
+      game.id = temp.replace( /^\D+/g, '');
+    } else {
+      game.id = -1;
+    }
 
-    var temp = stripNewLines($('.cs .cs').text()).split(' (');
+    temp = stripNewLines($('.cs .cs').text()).split(' (');
     game.cs = parseInt(temp[0]);
-    game.csps = parseFloat(temp[1].slice(0,-1));
+    if (typeof temp[1] !== 'undefined' ) {game.csps = parseFloat(temp[1].slice(0,-1));}
+    else {game.csps = -1;}
     game.gold = stripNewLines($('.gold .gold').text());
     game.wardsGreenBought = parseInt(stripNewLines($('.wards.sight').text()));
     game.wardsPinkBought = parseInt(stripNewLines($('.wards.vision').text()));
@@ -246,6 +253,7 @@ function parseSummoner(err, resp, html) {
       var $ = cheerio.load(_player);
 
       var player = {};
+      if ($('.player-me').length) {game.teamNum = 1; game.teamSide = "Blue"; game.teamSlot = j+1;}
       player.champion = stripNewLines($('.championIcon').attr('title'));
       player.championId = $('.championIcon').data().championid;
       player.championImage = stripNewLines($('.championIcon .img').css('background-image'));
@@ -259,6 +267,7 @@ function parseSummoner(err, resp, html) {
       var $ = cheerio.load(_player);
 
       var player = {};
+      if ($('.player-me').length) {game.teamNum = 2; game.teamSide = "Purple"; game.teamSlot = j+1;}
       player.champion = stripNewLines($('.championIcon').attr('title'));
       player.championId = $('.championIcon').data().championid;
       player.championImage = stripNewLines($('.championIcon .img').css('background-image'));
@@ -271,7 +280,6 @@ function parseSummoner(err, resp, html) {
   });
   ret.data[0].games = games;
   ret.data[0].gameCount = ret.data[0].games.length;
-  console.log(ret);
   res.send(ret);
   console.log('done');
 }
