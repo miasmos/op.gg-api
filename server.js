@@ -52,21 +52,21 @@ app.get('/:region/live', function(req,res){
 
 app.get('/:region/summoner/:summoner', function(req,res) {
   res.set('Content-Type', 'application/json');
-  options.url = 'http://'+req.params.region+'.op.gg/summoner/userName='+req.params.summoner;
+  options.url = 'http://'+req.params.region+'.op.gg/summoner/userName='+encodeURIComponent(req.params.summoner);
   console.log("parsing "+options.url);
   request(options,parseSummonerFactory(res));
 });
 
 app.get('/:region/summoner/:summoner/champions', function(req,res) {
   res.set('Content-Type', 'application/json');
-  options.url = 'http://'+req.params.region+'.op.gg/summoner/champions/userName='+req.params.summoner;
+  options.url = 'http://'+req.params.region+'.op.gg/summoner/champions/userName='+encodeURIComponent(req.params.summoner);
   console.log("parsing "+options.url);
   request(options,parseSummonerChampionsFactory(res));
 });
 
 app.get('/:region/summoner/:summoner/league', function(req,res) {
   res.set('Content-Type', 'application/json');
-  options.url = 'http://'+req.params.region+'.op.gg/summoner/league/userName='+req.params.summoner;
+  options.url = 'http://'+req.params.region+'.op.gg/summoner/league/userName='+encodeURIComponent(req.params.summoner);
   console.log("parsing "+options.url);
   request(options,parseSummonerLeagueFactory(res));
 });
