@@ -176,108 +176,114 @@ function parseSummonerFactory(res) {
 	  recent.winRatio = parseInt($('.AverageGameStats .WinRatioText').text().slice(0,-1));
 
 	  var temp = $('.AverageGameStats .WinRatioTitle').text().split('\n');
-	  recent.wins = parseInt(temp[2].slice(0,-1));
-	  recent.losses = parseInt(temp[3].slice(0,-1));
-	  recent.games = parseInt(temp[1].slice(0,-1));
-	  recent.kdaKillsAverage = parseFloat($('.AverageGameStats .kda .kill').text());
-	  recent.kdaDeathsAverage = parseFloat($('.AverageGameStats .kda .death').text());
-	  recent.kdaAssistsAverage = parseFloat($('.AverageGameStats .kda .assist').text());
-	  recent.kdaKillsTotal = parseInt($('.AverageGameStats .kdatotal .kill').text());
-	  recent.kdaDeathsTotal = parseInt($('.AverageGameStats .kdatotal .death').text());
-	  recent.kdaAssistsTotal = parseInt($('.AverageGameStats .kdatotal .assist').text());
-	  recent.kdaRatio = parseFloat($('.AverageGameStats .kdaratio .kdaratio').text().slice(0,-2));
-	  ret.data[0].recent = recent;
 
-	  var games = [];
-	  $('.GameBox').each(function(i,game) {
-	    var temp;
-	    var $ = cheerio.load(game);
-	    game = {};
-	    game.type = stripNewLines($('.subType').contents().eq(0).text()).slice(0,-2);
-	    game.date = stripNewLines($('._timeago').data('data-datetime'));
-	    game.mmr = parseInt(stripNewLines($('.mmr').text()).substring(11));
-	    
-	    game.length = stripNewLines($('.gameLength').text());
-	    game.result = stripNewLines($('.gameResult span').text());
-	    game.champion = stripNewLines($('.championName').text());
-	    game.championId = $('.championImage').data().championid;
-	    game.championImage = stripNewLines($('.championImage img').attr('src'));
-	    game.spell1 = stripNewLines($('.spell1 img').attr('src'));
-	    game.spell2 = stripNewLines($('.spell2 img').attr('src'));
-	    game.kills = parseInt(stripNewLines($('.kda .kill').text()));
-	    game.deaths = parseInt(stripNewLines($('.kda .death').text()));
-	    game.assists = parseInt(stripNewLines($('.kda .assist').text()));
-	    game.ratio = parseFloat(stripNewLines($('.kdaratio .kdaratio').text()).slice(0,-2));
-	    game.multikill = stripNewLines($('.multikill .kill').text());
-	    game.level = parseInt(stripNewLines($('.level .level').text()));
-	    
-	    if ($('.observer').length) {
-	      temp = stripURL($('.observer a').attr('href'));
-	      game.id = temp.replace( /^\D+/g, '');
-	    } else {
-	      game.id = -1;
-	    }
+	  if (temp && temp.length > 0 && temp[2]) {
+		  recent.wins = parseInt(temp[2].slice(0,-1));
+		  recent.losses = parseInt(temp[3].slice(0,-1));
+		  recent.games = parseInt(temp[1].slice(0,-1));
+		  recent.kdaKillsAverage = parseFloat($('.AverageGameStats .kda .kill').text());
+		  recent.kdaDeathsAverage = parseFloat($('.AverageGameStats .kda .death').text());
+		  recent.kdaAssistsAverage = parseFloat($('.AverageGameStats .kda .assist').text());
+		  recent.kdaKillsTotal = parseInt($('.AverageGameStats .kdatotal .kill').text());
+		  recent.kdaDeathsTotal = parseInt($('.AverageGameStats .kdatotal .death').text());
+		  recent.kdaAssistsTotal = parseInt($('.AverageGameStats .kdatotal .assist').text());
+		  recent.kdaRatio = parseFloat($('.AverageGameStats .kdaratio .kdaratio').text().slice(0,-2));
+		  ret.data[0].recent = recent;
 
-	    temp = stripNewLines($('.cs .cs').text()).split(' (');
-	    game.cs = parseInt(temp[0]);
-	    if (typeof temp[1] !== 'undefined' ) {game.csps = parseFloat(temp[1].slice(0,-1));}
-	    else {game.csps = -1;}
-	    game.gold = stripNewLines($('.gold .gold').text());
-	    game.wardsGreenBought = parseInt(stripNewLines($('.wards.sight').text()));
-	    game.wardsPinkBought = parseInt(stripNewLines($('.wards.vision').text()));
+		  var games = [];
+		  $('.GameBox').each(function(i,game) {
+		    var temp;
+		    var $ = cheerio.load(game);
+		    game = {};
+		    game.type = stripNewLines($('.subType').contents().eq(0).text()).slice(0,-2);
+		    game.date = stripNewLines($('._timeago').data('data-datetime'));
+		    game.mmr = parseInt(stripNewLines($('.mmr').text()).substring(11));
+		    
+		    game.length = stripNewLines($('.gameLength').text());
+		    game.result = stripNewLines($('.gameResult span').text());
+		    game.champion = stripNewLines($('.championName').text());
+		    game.championId = $('.championImage').data().championid;
+		    game.championImage = stripNewLines($('.championImage img').attr('src'));
+		    game.spell1 = stripNewLines($('.spell1 img').attr('src'));
+		    game.spell2 = stripNewLines($('.spell2 img').attr('src'));
+		    game.kills = parseInt(stripNewLines($('.kda .kill').text()));
+		    game.deaths = parseInt(stripNewLines($('.kda .death').text()));
+		    game.assists = parseInt(stripNewLines($('.kda .assist').text()));
+		    game.ratio = parseFloat(stripNewLines($('.kdaratio .kdaratio').text()).slice(0,-2));
+		    game.multikill = stripNewLines($('.multikill .kill').text());
+		    game.level = parseInt(stripNewLines($('.level .level').text()));
+		    
+		    if ($('.observer').length) {
+		      temp = stripURL($('.observer a').attr('href'));
+		      game.id = temp.replace( /^\D+/g, '');
+		    } else {
+		      game.id = -1;
+		    }
 
-	    var items = [];
-	    $('.Items .item32').each(function(j,_item) {
-	      var $ = cheerio.load(_item);
+		    temp = stripNewLines($('.cs .cs').text()).split(' (');
+		    game.cs = parseInt(temp[0]);
+		    if (typeof temp[1] !== 'undefined' ) {game.csps = parseFloat(temp[1].slice(0,-1));}
+		    else {game.csps = -1;}
+		    game.gold = stripNewLines($('.gold .gold').text());
+		    game.wardsGreenBought = parseInt(stripNewLines($('.wards.sight').text()));
+		    game.wardsPinkBought = parseInt(stripNewLines($('.wards.vision').text()));
 
-	      var item = {};
-	      item.name = stripNewLines($('.item32').attr('title'));
-	      item.image = $('.item32 .img').css('display');
-	      item.slot = j+1;
-	      items.push(item);
-	    });
-	    game.items = items;
+		    var items = [];
+		    $('.Items .item32').each(function(j,_item) {
+		      var $ = cheerio.load(_item);
 
-	    var trinket = {};
-	    trinket.name = stripNewLines($('.ItemsTrinket .item32').attr('original-title'));
-	    trinket.image = stripNewLines($('.ItemsTrinket .item32 .img').css('background-image'));
-	    trinket.slot = 1;
-	    game.items.push(trinket);
+		      var item = {};
+		      item.name = stripNewLines($('.item32').attr('title'));
+		      item.image = $('.item32 .img').css('display');
+		      item.slot = j+1;
+		      items.push(item);
+		    });
+		    game.items = items;
 
-	    var players = [];
-	    $('.teamId-100 .player').each(function(j,_player) {
-	      var $ = cheerio.load(_player);
+		    var trinket = {};
+		    trinket.name = stripNewLines($('.ItemsTrinket .item32').attr('original-title'));
+		    trinket.image = stripNewLines($('.ItemsTrinket .item32 .img').css('background-image'));
+		    trinket.slot = 1;
+		    game.items.push(trinket);
 
-	      var player = {};
-	      if ($('.player-me').length) {game.teamNum = 1; game.teamSide = "Blue"; game.teamSlot = j+1;}
-	      player.champion = stripNewLines($('.championIcon').attr('title'));
-	      player.championId = $('.championIcon').data().championid;
-	      player.championImage = stripNewLines($('.championIcon .img').css('background-image'));
-	      player.name = stripNewLines($('.summonerName a').text());
-	      players.push(player);
-	    });
-	    game.team1 = players;
+		    var players = [];
+		    $('.teamId-100 .player').each(function(j,_player) {
+		      var $ = cheerio.load(_player);
 
-	    var players = [];
-	    $('.teamId-200 .player').each(function(j,_player) {
-	      var $ = cheerio.load(_player);
+		      var player = {};
+		      if ($('.player-me').length) {game.teamNum = 1; game.teamSide = "Blue"; game.teamSlot = j+1;}
+		      player.champion = stripNewLines($('.championIcon').attr('title'));
+		      player.championId = $('.championIcon').data().championid;
+		      player.championImage = stripNewLines($('.championIcon .img').css('background-image'));
+		      player.name = stripNewLines($('.summonerName a').text());
+		      players.push(player);
+		    });
+		    game.team1 = players;
 
-	      var player = {};
-	      if ($('.player-me').length) {game.teamNum = 2; game.teamSide = "Purple"; game.teamSlot = j+1;}
-	      player.champion = stripNewLines($('.championIcon').attr('title'));
-	      player.championId = $('.championIcon').data().championid;
-	      player.championImage = stripNewLines($('.championIcon .img').css('background-image'));
-	      player.name = stripNewLines($('.summonerName a').text());
-	      players.push(player);
-	    });
-	    game.team2 = players;
+		    var players = [];
+		    $('.teamId-200 .player').each(function(j,_player) {
+		      var $ = cheerio.load(_player);
 
-	    games.push(game);
-	  });
-	  ret.data[0].games = games;
-	  ret.data[0].gameCount = ret.data[0].games.length;
-	  res.send(ret);
-	  console.log('done');
+		      var player = {};
+		      if ($('.player-me').length) {game.teamNum = 2; game.teamSide = "Purple"; game.teamSlot = j+1;}
+		      player.champion = stripNewLines($('.championIcon').attr('title'));
+		      player.championId = $('.championIcon').data().championid;
+		      player.championImage = stripNewLines($('.championIcon .img').css('background-image'));
+		      player.name = stripNewLines($('.summonerName a').text());
+		      players.push(player);
+		    });
+		    game.team2 = players;
+
+		    games.push(game);
+		  });
+		  ret.data[0].games = games;
+		  ret.data[0].gameCount = ret.data[0].games.length;
+		  res.send(ret);
+		} else {
+			ret.data = false;
+			res.send(ret);
+		}
+		console.log('done');
 	}
 	return parseSummoner;
 }
