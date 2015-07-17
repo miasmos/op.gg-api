@@ -200,6 +200,10 @@ function parseSummonerFactory(res) {
 		    game.mmr = parseInt(stripNewLines($('.mmr').text()).substring(11));
 		    
 		    game.length = stripNewLines($('.gameLength').text());
+		    game.datetime = stripNewLines($('._timeago').attr('data-datetime'));
+		    var gameClass = $('.MetaGameDetail .GameDetail').attr('class');
+		    gameClass = gameClass.substring(gameClass.indexOf('-gameId-')+8);
+		    game.gameId = stripNewLines(gameClass);
 		    game.result = stripNewLines($('.gameResult span').text());
 		    game.champion = stripNewLines($('.championName').text());
 		    game.championId = $('.championImage').data().championid;
