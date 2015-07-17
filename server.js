@@ -195,7 +195,7 @@ function parseSummonerFactory(res) {
 		    var temp;
 		    var $ = cheerio.load(game);
 		    game = {};
-		    game.type = stripNewLines($('.subType').contents().eq(0).text()).slice(0,-2);
+		    game.type = stripNewLines($('.subType').contents().eq(0).text());
 		    game.date = stripNewLines($('._timeago').data('data-datetime'));
 		    game.mmr = parseInt(stripNewLines($('.mmr').text()).substring(11));
 		    
@@ -238,6 +238,7 @@ function parseSummonerFactory(res) {
 
 		      var item = {};
 		      item.name = stripNewLines($('.item32').attr('title'));
+		      if (item.name) item.name = item.name.substring(item.name.indexOf(">")+1, item.name.indexOf('</b>'));
 		      item.image = $('.item32 .img').css('display');
 		      item.slot = j+1;
 		      items.push(item);
