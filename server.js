@@ -311,8 +311,15 @@ function parseSummonerFactory(res) {
 
 function parseSummonerRefreshFactory(res) {
 	function parseSummonerRefresh(err, resp, html) {
-	  var json = JSON.parse(html);
 	  var ret = {status:'ok'};
+	  if (err) {
+	    ret.status = 'error';
+	    ret.error = error;
+	    res.send(ret);
+	    return console.error(err);
+	  }
+
+	  var json = JSON.parse(html);
 	  if (json.error) {
 	  	ret.status = 'error';
 	  	ret.error = html.substring(html.indexOf('\\"message\\":\\"')+14, html.indexOf('\\",\\"type\\"'));
