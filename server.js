@@ -43,11 +43,27 @@ app.param('gamenum', function(req,res,next,id) {
 	next();
 });
 
+app.param('summonerId', function(req,res,next,id) {
+  if (req.params.gamenum < 10000) {
+    res.send({'status':'error','error':'invalid summoner id'});
+    return;
+  }
+	options.summonerId = req.params.summonerId;
+	next();
+});
+
 app.get('/:region/live', function(req,res){
   res.set('Content-Type', 'application/json');
   options.url = 'http://'+req.params.region+'.op.gg/spectate/pro/';
   console.log("parsing "+options.url);
   request(options,parseLiveFactory(res));
+});
+
+app.get('/:region/refresh/:summonerId', function(req,res) {
+  res.set('Content-Type', 'application/json');
+  options.url = 'http://na.op.gg/summoner/ajax/update.json/summonerId='+req.params.summonerId;
+  console.log("parsing "+options.url);
+  request(options,parseSummonerRefreshFactory(res));
 });
 
 app.get('/:region/summoner/:summoner', function(req,res) {
@@ -297,6 +313,21 @@ function parseSummonerFactory(res) {
 		console.log('done');
 	}
 	return parseSummoner;
+}
+
+function parseSummonerRefreshFactory(res) {
+	function parseSummonerRefresh(err, resp, html) {
+	  var json = JSON.parse(html);
+	  var ret = {status:'ok'};
+	  if (json.error) {
+	  	ret.status = 'error';
+	  	ret.error = html.substring(html.indexOf('\\"message\\":\\"')+14, html.indexOf('\\",\\"type\\"'));
+	  }
+	  
+	  res.send(ret);
+	  console.log('done');
+	}
+	return parseSummonerRefresh;
 }
 
 function parseSummonerChampionsFactory(res) {

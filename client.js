@@ -73,6 +73,11 @@ opggClient.prototype.AmateurPlayers = function(region, callback){
   var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/amateur';
   this.request(url,callback);
 }
+
+opggClient.prototype.Refresh = function(region, summonerId, callback){
+  var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/refresh/'+summonerId;
+  this.request(url,callback);
+}
 /* End Public Methods */
 
 module.exports = opggClient;
