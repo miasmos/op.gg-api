@@ -299,6 +299,7 @@ function parseSummonerFactory(res) {
 		  });
 		  ret.data[0].games = games;
 		  ret.data[0].gameCount = ret.data[0].games.length;
+		  ret.data[0].summonerId = parseInt($('.summonerRefreshButton').attr('data-summoner-id'));
 		  res.send(ret);
 		} else {
 			ret.data = false;
