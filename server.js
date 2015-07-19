@@ -143,7 +143,7 @@ function parseLiveFactory(res) {
 	  if (!err) {err = checkForError(html);}
 	  if (err) {
 	    ret.status = 'error';
-	    ret.error = error;
+	    ret.error = err;
 	    res.send(ret);
 	    return console.error(err);
 	  }
@@ -314,7 +314,7 @@ function parseSummonerRefreshFactory(res) {
 	  var ret = {status:'ok'};
 	  if (err) {
 	    ret.status = 'error';
-	    ret.error = error;
+	    ret.error = err;
 	    res.send(ret);
 	    return console.error(err);
 	  }
@@ -339,7 +339,7 @@ function parseSummonerChampionsFactory(res) {
 	  if (!err) {err = checkForError(html);}
 	  if (err) {
 	    ret.status = 'error';
-	    ret.error = error;
+	    ret.error = err;
 	    res.send(ret);
 	    return console.error(err);
 	  }
@@ -376,7 +376,7 @@ function parseSpectateListProFactory(res) {
 	  if (!err) {err = checkForError(html);}
 	  if (err) {
 	    ret.status = 'error';
-	    ret.error = error;
+	    ret.error = err;
 	    res.send(ret);
 	    return console.error(err);
 	  }
@@ -410,7 +410,7 @@ function parseSpectateListAmateurFactory(res) {
 	  if (!err) {err = checkForError(html);}
 	  if (err) {
 	    ret.status = 'error';
-	    ret.error = error;
+	    ret.error = err;
 	    res.send(ret);
 	    return console.error(err);
 	  }
@@ -444,6 +444,7 @@ function parseSummonerLeagueFactory(res) {
 	  if (!err) {err = checkForError(html);}
 	  if (err) {
 	    ret.status = 'error';
+	    ret.error = err;
 	    res.send(ret);
 	    return console.error(err);
 	  }
@@ -488,7 +489,7 @@ function parseLeagueFactory(res) {
 	  if (!err) {err = checkForError(html);}
 	  if (err) {
 	    ret.status = 'error';
-	    ret.error = error;
+	    ret.error = err;
 	    res.send(ret);
 	    return console.error(err);
 	  }
