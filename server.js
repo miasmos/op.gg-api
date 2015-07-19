@@ -69,7 +69,7 @@ app.get('/:region/refresh/:summonerId', function(req,res) {
 app.get('/:region/summoner/:summoner', function(req,res) {
   res.set('Content-Type', 'application/json');
   var url = encodeURIComponent(req.params.summoner);
-  url = url.replace(/\s/g, '');
+  url = url.replace(/[\s]|[\\+]|[%2B]/g, '%20');
   options.url = 'http://'+req.params.region+'.op.gg/summoner/userName='+url;
   console.log("parsing "+options.url);
   request(options,parseSummonerFactory(res));
@@ -78,7 +78,7 @@ app.get('/:region/summoner/:summoner', function(req,res) {
 app.get('/:region/summoner/:summoner/champions', function(req,res) {
   res.set('Content-Type', 'application/json');
   var url = encodeURIComponent(req.params.summoner);
-  url = url.replace(/\s/g, '');
+  url = url.replace(/[\s]|[\\+]|[%2B]/g, '%20');
   options.url = 'http://'+req.params.region+'.op.gg/summoner/champions/userName='+url;
   console.log("parsing "+options.url);
   request(options,parseSummonerChampionsFactory(res));
@@ -87,7 +87,7 @@ app.get('/:region/summoner/:summoner/champions', function(req,res) {
 app.get('/:region/summoner/:summoner/league', function(req,res) {
   res.set('Content-Type', 'application/json');
   var url = encodeURIComponent(req.params.summoner);
-  url = url.replace(/\s/g, '');
+  url = url.replace(/[\s]|[\\+]|[%2B]/g, '%20');
   options.url = 'http://'+req.params.region+'.op.gg/summoner/league/userName='+url;
   console.log("parsing "+options.url);
   request(options,parseSummonerLeagueFactory(res));
