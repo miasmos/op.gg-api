@@ -44,7 +44,7 @@ app.param('gamenum', function(req,res,next,id) {
 });
 
 app.param('summonerId', function(req,res,next,id) {
-  if (req.params.gamenum < 10000) {
+  if (req.params.summonerId < 10000) {
     res.send({'status':'error','error':'invalid summoner id'});
     return;
   }
