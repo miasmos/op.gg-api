@@ -26,7 +26,10 @@ Fetches the specified summoner's standing in their league as well as the top 200
 Fetches the top 200 players in the specified region.
 
 /:region/spectate/download/:gameID => http://:region.op.gg/match/observer/id=:gameID  
-Fetches the spectator bat file associated with the specified game ID
+Fetches the spectator bat file associated with the specified game ID  
+
+/:region/refresh/:summonerId => http://:region.op.gg/summoner/ajax/update.json/?summonerId=:summonerId
+Refreshes the specified summoner Id's data.
 <br>
 Dependencies
 ==========
