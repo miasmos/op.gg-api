@@ -61,7 +61,7 @@ app.get('/:region/live', function(req,res){
 
 app.get('/:region/refresh/:summonerId', function(req,res) {
   res.set('Content-Type', 'application/json');
-  options.url = 'http://na.op.gg/summoner/ajax/update.json/summonerId='+req.params.summonerId;
+  options.url = 'http://na.op.gg/summoner/ajax/update.json/?summonerId='+req.params.summonerId;
   console.log("parsing "+options.url);
   request(options,parseSummonerRefreshFactory(res));
 });
