@@ -54,69 +54,63 @@ app.param('summonerId', function(req,res,next,id) {
 
 app.get('/:region/live', function(req,res){
   res.set('Content-Type', 'application/json');
-  options.url = 'http://'+req.params.region+'.op.gg/spectate/pro/';
+  options.url = 'http://'+parseURL(req.params.region)+'.op.gg/spectate/pro/';
   console.log("parsing "+options.url);
   request(options,parseLiveFactory(res));
 });
 
 app.get('/:region/refresh/:summonerId', function(req,res) {
   res.set('Content-Type', 'application/json');
-  options.url = 'http://na.op.gg/summoner/ajax/update.json/?summonerId='+req.params.summonerId;
+  options.url = 'http://na.op.gg/summoner/ajax/update.json/?summonerId='+parseURL(req.params.summonerId);
   console.log("parsing "+options.url);
   request(options,parseSummonerRefreshFactory(res));
 });
 
 app.get('/:region/summoner/:summoner', function(req,res) {
   res.set('Content-Type', 'application/json');
-  var url = encodeURIComponent(req.params.summoner);
-  url = url.replace(/[\s]|[\\+]|[%2B]/g, '%20');
-  options.url = 'http://'+req.params.region+'.op.gg/summoner/userName='+url;
+  options.url = 'http://'+parseURL(req.params.region)+'.op.gg/summoner/userName='+parseURL(req.params.summoner);
   console.log("parsing "+options.url);
   request(options,parseSummonerFactory(res));
 });
 
 app.get('/:region/summoner/:summoner/champions', function(req,res) {
   res.set('Content-Type', 'application/json');
-  var url = encodeURIComponent(req.params.summoner);
-  url = url.replace(/[\s]|[\\+]|[%2B]/g, '%20');
-  options.url = 'http://'+req.params.region+'.op.gg/summoner/champions/userName='+url;
+  options.url = 'http://'+parseURL(req.params.region)+'.op.gg/summoner/champions/userName='+parseURL(req.params.summoner);
   console.log("parsing "+options.url);
   request(options,parseSummonerChampionsFactory(res));
 });
 
 app.get('/:region/summoner/:summoner/league', function(req,res) {
   res.set('Content-Type', 'application/json');
-  var url = encodeURIComponent(req.params.summoner);
-  url = url.replace(/[\s]|[\\+]|[%2B]/g, '%20');
-  options.url = 'http://'+req.params.region+'.op.gg/summoner/league/userName='+url;
+  options.url = 'http://'+parseURL(req.params.region)+'.op.gg/summoner/league/userName='+parseURL(req.params.summoner);
   console.log("parsing "+options.url);
   request(options,parseSummonerLeagueFactory(res));
 });
 
 app.get('/:region/league', function(req,res) {
   res.set('Content-Type', 'application/json');
-  options.url = 'http://'+req.params.region+'.op.gg/ranking/ladder';
+  options.url = 'http://'+parseURL(req.params.region)+'.op.gg/ranking/ladder';
   console.log("parsing "+options.url);
   request(options,parseLeagueFactory(res));
 });
 
 app.get('/:region/pro', function(req, res) {
   res.set('Content-Type', 'application/json');
-  options.url = 'http://'+req.params.region+'.op.gg/spectate/list';
+  options.url = 'http://'+parseURL(req.params.region)+'.op.gg/spectate/list';
   console.log("parsing "+options.url);
   request(options,parseSpectateListProFactory(res)); 
 });
 
 app.get('/:region/amateur', function(req, res) {
   res.set('Content-Type', 'application/json');
-  options.url = 'http://'+req.params.region+'.op.gg/spectate/list';
+  options.url = 'http://'+parseURL(req.params.region)+'.op.gg/spectate/list';
   console.log("parsing "+options.url);
   request(options,parseSpectateListAmateur(res)); 
 });
 
 app.get('/:region/spectate/download/:gamenum', function(req,res) {
 	res.set('Content-Type', 'text/html');
-	options.url = 'http://'+req.params.region+'.op.gg/match/observer/id='+req.params.gamenum;
+	options.url = 'http://'+parseURL(req.params.region)+'.op.gg/match/observer/id='+parseURL(req.params.gamenum);
 	console.log("parsing "+options.url);
 
 	var rem = request(options);
@@ -553,5 +547,10 @@ function stripNewLines(str) {
 function stripURL(str) {
   if (typeof(str) === 'undefined') {return str}
   return str.split('=')[1];
+}
+
+function parseURL(url) {
+	url = encodeURIComponent(url);
+  	return url.replace(/%2B/g, '%20');
 }
 /* end fetch */
