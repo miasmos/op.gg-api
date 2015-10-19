@@ -12,7 +12,8 @@ var options = {
   headers: {
     'Content-Type': 'text/html',
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36',
-    'Accept-Language': 'en-GB,en-US;q=0.8,en;q=0.6'
+    'Accept-Language': 'en-GB,en-US;q=0.8,en;q=0.6',
+    'Cookie': 'oldLayout=true'
   }
 };
 
