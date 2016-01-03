@@ -1,7 +1,14 @@
 op.gg-api
 =========
 Converts live op.gg pages into json endpoints  
-<br><br>
+  
+  
+Getting Started  
+==========  
+```
+npm install
+```  
+  
 Endpoints
 ==========
 /:region/live => http://:region.op.gg/spectate/pro/  
