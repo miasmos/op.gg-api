@@ -1,0 +1,37 @@
+{
+  "name": "op.gg-api",
+  "version": "0.0.5",
+  "description": "Parses live op.gg pages into json endpoints",
+  "main": "server.js",
+  "dependencies": {
+    "cheerio": "^0.17.0",
+    "express": "^4.9.3",
+    "request": "^2.44.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://stephenpoole@github.com/stephenpoole/op.gg-api.git"
+  },
+  "keywords": [
+    "op.gg",
+    "league",
+    "of",
+    "legends",
+    "api",
+    "op",
+    "gg",
+    "opgg",
+    "summoner"
+  ],
+  "author": "Stephen Poole",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stephenpoole/op.gg-api/issues"
+  },
+  "homepage": "https://github.com/stephenpoole/op.gg-api#readme"
+}
