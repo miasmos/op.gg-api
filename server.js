@@ -1,127 +1,110 @@
-var request = require('request');
-var express = require('express');
-var cheerio = require('cheerio');
-var http = require('http');
-var fs = require('fs');
+let express = require('express'),
+	http = require('http'),
+	parse = require('./lib/parse'),
+	validate = require('./lib/validate'),
+	response = require('./lib/response'),
+	error = require('./lib/error.json'),
+	fs = require('fs'),
+	app = express()
 
-/* app */
-var app = express();
-var regions = ['kr','na','euw','eune','oce','br','ru','las','lan','tr'];
-var options = {
-  url: '',
-  headers: {
-    'Content-Type': 'text/html',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36',
-    'Accept-Language': 'en-GB,en-US;q=0.8,en;q=0.6',
-    'Cookie': 'oldLayout=true'
+app.set('json spaces', 4)
+
+app.param('region', (req,res,next,id) => {
+  if (!validate.Region(req.params.region)) {
+    res.json(response.Make(undefined, error.INVALID_PARAM_REGION))
+    return
   }
-};
+  next()
+})
 
-app.param('region', function(req,res,next,id){
-  if (regions.indexOf(req.params.region) == -1) {
-    res.send({'status':'error','error':'invalid region'});
-    return;
+app.param('summoner', (req,res,next,id) => {
+  if (!validate.SummonerName(req.params.summoner)) {
+    res.json(response.Make(undefined, error.INVALID_PARAM_SUMMONER_NAME))
+    return
   }
-  if (req.params.region == 'kr') {req.params.region = 'www';}
-  options.region = req.params.region;
-  next();
-});
+  next()
+})
 
-app.param('summoner', function(req,res,next,id){
-  if (req.params.summoner.length > 16 || req.params.summoner.length < 3) {
-    res.send({'status':'error','error':'invalid summoner name'});
-    return;
+app.param('gamenum', (req,res,next,id) => {
+  if (!validate.GameId(req.params.gamenum)) {
+    res.json(response.Make(undefined, error.INVALID_PARAM_GAME_ID))
+    return
   }
-  next();
-});
+	next()
+})
 
-app.param('gamenum', function(req,res,next,id) {
-  if (req.params.gamenum % 1 !== 0 || parseInt(req.params.gamenum) < 1000000000) {
-    res.send({'status':'error','error':'invalid game number'});
-    return;
+app.param('summonerId', (req,res,next,id) => {
+  if (!validate.SummonerId(req.params.summonerId)) {
+    res.json(response.Make(undefined, error.INVALID_PARAM_SUMMONER_ID))
+    return
   }
-	options.gamenum = req.params.gamenum;
-	next();
-});
+	next()
+})
 
-app.param('summonerId', function(req,res,next,id) {
-  if (req.params.summonerId < 10000) {
-    res.send({'status':'error','error':'invalid summoner id'});
-    return;
-  }
-	options.summonerId = req.params.summonerId;
-	next();
-});
-
-app.get('/:region/live', function(req,res){
-  res.set('Content-Type', 'application/json');
-  options.url = 'http://'+parseURL(req.params.region)+'.op.gg/spectate/pro/';
-  console.log("parsing "+options.url);
-  request(options,parseLiveFactory(res));
-});
+app.get('/:region/live', (req,res) => {
+	parse.Live(req.params.region)
+		.then((data) => {
+			response.Make(undefined, data)
+		})
+		.catch((error) => {
+			response.Make(error, undefined)
+		})
+})
 
 app.get('/:region/refresh/:summonerId', function(req,res) {
-  res.set('Content-Type', 'application/json');
   options.url = 'http://'+parseURL(req.params.region)+'.op.gg/summoner/ajax/update.json/?summonerId='+parseURL(req.params.summonerId);
   console.log("parsing "+options.url);
   request(options,parseSummonerRefreshFactory(res));
 });
 
 app.get('/:region/summoner/:summoner', function(req,res) {
-  res.set('Content-Type', 'application/json');
   options.url = 'http://'+parseURL(req.params.region)+'.op.gg/summoner/userName='+parseURL(req.params.summoner);
   console.log("parsing "+options.url);
   request(options,parseSummonerFactory(res));
 });
 
 app.get('/:region/summoner/:summoner/champions', function(req,res) {
-  res.set('Content-Type', 'application/json');
   options.url = 'http://'+parseURL(req.params.region)+'.op.gg/summoner/champions/userName='+parseURL(req.params.summoner);
   console.log("parsing "+options.url);
   request(options,parseSummonerChampionsFactory(res));
 });
 
 app.get('/:region/summoner/:summoner/league', function(req,res) {
-  res.set('Content-Type', 'application/json');
   options.url = 'http://'+parseURL(req.params.region)+'.op.gg/summoner/league/userName='+parseURL(req.params.summoner);
   console.log("parsing "+options.url);
   request(options,parseSummonerLeagueFactory(res));
 });
 
 app.get('/:region/league', function(req,res) {
-  res.set('Content-Type', 'application/json');
   options.url = 'http://'+parseURL(req.params.region)+'.op.gg/ranking/ladder';
   console.log("parsing "+options.url);
   request(options,parseLeagueFactory(res));
 });
 
 app.get('/:region/pro', function(req, res) {
-  res.set('Content-Type', 'application/json');
   options.url = 'http://'+parseURL(req.params.region)+'.op.gg/spectate/list';
   console.log("parsing "+options.url);
   request(options,parseSpectateListProFactory(res)); 
 });
 
 app.get('/:region/amateur', function(req, res) {
-  res.set('Content-Type', 'application/json');
   options.url = 'http://'+parseURL(req.params.region)+'.op.gg/spectate/list';
   console.log("parsing "+options.url);
   request(options,parseSpectateListAmateur(res)); 
 });
 
 app.get('/:region/spectate/download/:gamenum', function(req,res) {
-	res.set('Content-Type', 'text/html');
 	options.url = 'http://'+parseURL(req.params.region)+'.op.gg/match/observer/id='+parseURL(req.params.gamenum);
 	console.log("parsing "+options.url);
 
 	var rem = request(options);
   	rem.on('response', function(resp) {
 	    if (resp.statusCode != '200' || resp.headers['content-type'].indexOf('text/html') > -1) {
-	    	res.send({status:'error', error: 'game file not found'});
+	    	res.json({status:'error', error: 'game file not found'});
 	    } else {
 	    	var file = fs.createWriteStream('../replays/'+req.params.gamenum+'.bat');
 	    	rem.pipe(file);
-	    	res.send({status:'ok'});
+	    	res.json({status:'ok'});
 	    }
 	});
 
@@ -145,7 +128,7 @@ function parseLiveFactory(res) {
 	  if (err) {
 	    ret.status = 'error';
 	    ret.error = err;
-	    res.send(ret);
+	    res.json(ret);
 	    return console.error(err);
 	  }
 	  
@@ -167,10 +150,12 @@ function parseLiveFactory(res) {
 	    });
 	  });
 	  
-	  res.send(ret);
+	  res.json(ret);
 	  console.log('done');
 	}
-	return parseLive;
+	return new Promise((resolve, reject) => {
+		parseLive()
+	});
 }
 
 function parseSummonerFactory(res) {
@@ -182,7 +167,7 @@ function parseSummonerFactory(res) {
 	  if (err) {
 	    ret.status = 'error';
 	    ret.error = err;
-	    res.send(ret);
+	    res.json(ret);
 	    return console.error(err);
 	  }
 	  
@@ -301,10 +286,10 @@ function parseSummonerFactory(res) {
 		  ret.data[0].games = games;
 		  ret.data[0].gameCount = ret.data[0].games.length;
 		  ret.data[0].summonerId = parseInt($('.summonerRefreshButton').attr('data-summoner-id'));
-		  res.send(ret);
+		  res.json(ret);
 		} else {
 			ret.data = false;
-			res.send(ret);
+			res.json(ret);
 		}
 		console.log('done');
 	}
@@ -317,7 +302,7 @@ function parseSummonerRefreshFactory(res) {
 	  if (err) {
 	    ret.status = 'error';
 	    ret.error = err;
-	    res.send(ret);
+	    res.json(ret);
 	    return console.error(err);
 	  }
 
@@ -327,7 +312,7 @@ function parseSummonerRefreshFactory(res) {
 	  	ret.error = html.substring(html.indexOf('\\"message\\":\\"')+14, html.indexOf('\\",\\"type\\"'));
 	  }
 	  
-	  res.send(ret);
+	  res.json(ret);
 	  console.log('done');
 	}
 	return parseSummonerRefresh;
@@ -342,7 +327,7 @@ function parseSummonerChampionsFactory(res) {
 	  if (err) {
 	    ret.status = 'error';
 	    ret.error = err;
-	    res.send(ret);
+	    res.json(ret);
 	    return console.error(err);
 	  }
 	  
@@ -364,7 +349,7 @@ function parseSummonerChampionsFactory(res) {
 	    ret.data.push(summoner);
 	  });
 
-	  res.send(ret);
+	  res.json(ret);
 	  console.log('done');
 	}
 	return parseSummonerChampions;
@@ -379,7 +364,7 @@ function parseSpectateListProFactory(res) {
 	  if (err) {
 	    ret.status = 'error';
 	    ret.error = err;
-	    res.send(ret);
+	    res.json(ret);
 	    return console.error(err);
 	  }
 	  
@@ -398,7 +383,7 @@ function parseSpectateListProFactory(res) {
 	    ret.data.push(summoner);
 	  });
 
-	  res.send(ret);
+	  res.json(ret);
 	  console.log('done');
 	}
 	return parseSpectateListPro;
@@ -413,7 +398,7 @@ function parseSpectateListAmateurFactory(res) {
 	  if (err) {
 	    ret.status = 'error';
 	    ret.error = err;
-	    res.send(ret);
+	    res.json(ret);
 	    return console.error(err);
 	  }
 	  
@@ -432,7 +417,7 @@ function parseSpectateListAmateurFactory(res) {
 	    ret.data.push(summoner);
 	  });
 
-	  res.send(ret);
+	  res.json(ret);
 	  console.log('done');
 	}
 	return parseSpectateListAmateur;
@@ -447,7 +432,7 @@ function parseSummonerLeagueFactory(res) {
 	  if (err) {
 	    ret.status = 'error';
 	    ret.error = err;
-	    res.send(ret);
+	    res.json(ret);
 	    return console.error(err);
 	  }
 	    
@@ -477,7 +462,7 @@ function parseSummonerLeagueFactory(res) {
 
 	  ret.data[0].league = league;
 	  ret.data[0].summoners = summoners;
-	  res.send(ret);
+	  res.json(ret);
 	  console.log('done');
 	}
 	return parseSummonerLeague;
@@ -492,7 +477,7 @@ function parseLeagueFactory(res) {
 	  if (err) {
 	    ret.status = 'error';
 	    ret.error = err;
-	    res.send(ret);
+	    res.json(ret);
 	    return console.error(err);
 	  }
 	  
@@ -537,7 +522,7 @@ function parseLeagueFactory(res) {
 	    ret.data.push(summoner);
 	  });
 
-	  res.send(ret);
+	  res.json(ret);
 	  console.log('done');
 	}
 	return parseLeague;

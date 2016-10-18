@@ -1,7 +1,13 @@
-var opgg = require('./client.js');
-var options = { 'host': '127.0.0.1' };
-var gg = new opgg(options);
+var gg = require('./client.js');
 
-gg.Summoner('kr', 'SKT T1 Faker', function(data){
-  console.log(data);
-});
+gg.Live('kr')
+	.then((json) => {
+		console.log(json)
+	})
+	.catch((error) => {
+		console.error(error)
+	})
+
+gg.Live('kr', function(error, data) {
+	console.log(error || data)
+})
