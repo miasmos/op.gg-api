@@ -1,3 +1,4 @@
+'use strict'
 let express = require('express'),
 	http = require('http'),
 	parse = require('./lib/parse'),
@@ -44,10 +45,10 @@ app.param('summonerId', (req,res,next,id) => {
 app.get('/:region/live', (req,res) => {
 	parse.Live(req.params.region)
 		.then((data) => {
-			response.Make(undefined, data)
+			res.send(response.Make(undefined, data))
 		})
 		.catch((error) => {
-			response.Make(error, undefined)
+			res.send(response.Make(error, undefined))
 		})
 })
 

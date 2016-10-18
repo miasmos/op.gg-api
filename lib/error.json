@@ -4,5 +4,6 @@
 	"INVALID_PARAM_REGION": "Invalid region",
 	"INVALID_PARAM_SUMMONER_NAME": "Invalid summoner name",
 	"INVALID_PARAMS_GAME_ID": "Invalid game ID",
-	"INVALID_PARAM_SUMMONER_ID": "Invalid summoner ID"
+	"INVALID_PARAM_SUMMONER_ID": "Invalid summoner ID",
+	"API_KEY_MISSING": "Riot API key is missing"
 }
