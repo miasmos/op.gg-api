@@ -11,6 +11,11 @@ module.exports = class opgg {
     let validated = validate.Region(region)
 
     if (typeof callback === 'function') {
+      if (!validated) {
+        callback(Error.INVALID_PARAM_REGION, undefined)
+        return
+      }
+
       parse.Live(region)
         .then((json) => {
           callback(undefined, json)
