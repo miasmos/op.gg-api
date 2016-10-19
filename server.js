@@ -42,13 +42,29 @@ app.param('summonerId', (req,res,next,id) => {
 	next()
 })
 
+app.use((req, res, next) => {
+	resolve('api_key' in req.query, 'api_key', validate.RiotAPIKey, error.INVALID_API_KEY)
+
+	function resolve(shouldValidate, querystring, validateFn, error) {
+		if (shouldValidate) {
+			if (validateFn.call(this, req.query[querystring])) {	//validated successfully
+				next()
+			} else {
+				res.json(response.Make(undefined, error))
+			}
+		} else {
+			next()
+		}
+	}
+})
+
 app.get('/:region/live', (req,res) => {
-	parse.Live(req.params.region)
+	parse.Live(req.params.region, req.query.api_key)
 		.then((data) => {
-			res.send(response.Make(undefined, data))
+			res.json(response.Make(undefined, data))
 		})
 		.catch((error) => {
-			res.send(response.Make(error, undefined))
+			res.json(response.Make(error, undefined))
 		})
 })
 

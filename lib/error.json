@@ -5,5 +5,6 @@
 	"INVALID_PARAM_SUMMONER_NAME": "Invalid summoner name",
 	"INVALID_PARAMS_GAME_ID": "Invalid game ID",
 	"INVALID_PARAM_SUMMONER_ID": "Invalid summoner ID",
-	"API_KEY_MISSING": "Riot API key is missing"
+	"API_KEY_MISSING": "Riot API key is missing",
+	"INVALID_API_KEY": "Riot API key is invalid"
 }
