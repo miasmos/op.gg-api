@@ -68,11 +68,16 @@ app.get('/:region/live', (req,res) => {
 		})
 })
 
-app.get('/:region/refresh/:summonerId', function(req,res) {
-  options.url = 'http://'+parseURL(req.params.region)+'.op.gg/summoner/ajax/update.json/?summonerId='+parseURL(req.params.summonerId);
-  console.log("parsing "+options.url);
-  request(options,parseSummonerRefreshFactory(res));
-});
+app.get('/:region/refresh/:summonerId', (req,res) => {
+	parse.Refresh(req.params.region, req.params.summonerId)
+		.then((data) => {
+			res.send(response.Make(undefined, data))
+		})
+		.catch((error) => {
+			console.log(error)
+			res.send(response.Make(error, undefined))
+		})
+})
 
 app.get('/:region/summoner/:summoner', function(req,res) {
   options.url = 'http://'+parseURL(req.params.region)+'.op.gg/summoner/userName='+parseURL(req.params.summoner);

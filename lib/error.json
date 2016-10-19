@@ -1,10 +1,13 @@
 {
-	"INVALID_HTML": "Got invalid HTML when fetching the page.",
 	"EMPTY_RESPONSE": "Response is empty, this usually means that the page's DOM structure has been changed.",
-	"INVALID_PARAM_REGION": "Invalid region",
-	"INVALID_PARAM_SUMMONER_NAME": "Invalid summoner name",
-	"INVALID_PARAMS_GAME_ID": "Invalid game ID",
-	"INVALID_PARAM_SUMMONER_ID": "Invalid summoner ID",
-	"API_KEY_MISSING": "Riot API key is missing",
-	"INVALID_API_KEY": "Riot API key is invalid"
+	"INVALID_PARAM_REGION": "Invalid region.",
+	"INVALID_PARAM_SUMMONER_NAME": "Invalid summoner name.",
+	"INVALID_PARAMS_GAME_ID": "Invalid game ID.",
+	"INVALID_PARAM_SUMMONER_ID": "Invalid summoner ID.",
+	"API_KEY_MISSING": "Riot API key is missing.",
+	"INVALID_API_KEY": "Riot API key is invalid.",
+	"PARSE_FAILED": "Failed to parse HTML.",
+	"INVALID_RESPONSE": "Invalid response received.",
+	"RATE_LIMITED": "Your request was rate limited by the client. Try again later.",
+	"GENERIC_ERROR": "An undiagnosed error has occurred. Create an issue request with the steps to reproduce."
 }
