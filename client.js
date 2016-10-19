@@ -7,7 +7,13 @@ let parse = require('./lib/parse'),
 
 
 module.exports = class opgg {
-  static Live(region, callback) {
+  constructor(opts) {
+    if (!opts) opts = {}
+    this.api_key = opts.api_key ? opts.api_key : undefined
+    if (!!this.api_key && !validate.RiotAPIKey(this.api_key)) throw new Error(error.INVALID_API_KEY)
+  }
+
+  Live(region, callback) {
     let validated = validate.Region(region)
 
     if (typeof callback === 'function') {
@@ -16,7 +22,7 @@ module.exports = class opgg {
         return
       }
 
-      parse.Live(region)
+      parse.Live(region, this.api_key)
         .then((json) => {
           callback(undefined, json)
         })
@@ -26,7 +32,7 @@ module.exports = class opgg {
     } else {
       return new Promise((resolve, reject) => {
           if (!validated) reject(Error.INVALID_PARAM_REGION)
-          else resolve(parse.Live(region))
+          else resolve(parse.Live(region, this.api_key))
       })
     }
   }

@@ -1,4 +1,4 @@
-var gg = require('./client.js');
+var gg = new (require('./client.js'))
 
 gg.Live('kr')
 	.then((json) => {
@@ -7,7 +7,3 @@ gg.Live('kr')
 	.catch((error) => {
 		console.error(error)
 	})
-
-gg.Live('kr', function(error, data) {
-	console.log(error || data)
-})
