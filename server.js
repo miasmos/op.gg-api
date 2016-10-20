@@ -70,8 +70,8 @@ app.get('/:region/live', (req,res) => {
 		})
 })
 
-app.get('/:region/refresh/:summonerId', (req,res) => {
-	parse.Refresh(req.params.region, req.params.summonerId)
+app.get('/:region/renew/:summonerId', (req,res) => {
+	parse.Renew(req.params.region, req.params.summonerId)
 		.then((data) => {
 			res.send(response.Ok(data))
 		})
@@ -317,28 +317,6 @@ function parseSummonerFactory(res) {
 		console.log('done');
 	}
 	return parseSummoner;
-}
-
-function parseSummonerRefreshFactory(res) {
-	function parseSummonerRefresh(err, resp, html) {
-	  var ret = {status:'ok'};
-	  if (err) {
-	    ret.status = 'error';
-	    ret.error = err;
-	    res.json(ret);
-	    return console.error(err);
-	  }
-
-	  var json = JSON.parse(html);
-	  if (json.error) {
-	  	ret.status = 'error';
-	  	ret.error = html.substring(html.indexOf('\\"message\\":\\"')+14, html.indexOf('\\",\\"type\\"'));
-	  }
-	  
-	  res.json(ret);
-	  console.log('done');
-	}
-	return parseSummonerRefresh;
 }
 
 function parseSummonerChampionsFactory(res) {
