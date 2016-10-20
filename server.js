@@ -1,7 +1,7 @@
 'use strict'
 let express = require('express'),
 	http = require('http'),
-	parse = require('./lib/parse'),
+	parse = require('./lib/Parser/Parser'),
 	validate = require('./lib/validate'),
 	response = require('./lib/Responses/Response'),
 	Error = require('./lib/Responses/Error'),
@@ -80,11 +80,15 @@ app.get('/:region/renew/:summonerId', (req,res) => {
 		})
 })
 
-app.get('/:region/summoner/:summoner', function(req,res) {
-  options.url = 'http://'+parseURL(req.params.region)+'.op.gg/summoner/userName='+parseURL(req.params.summoner);
-  console.log("parsing "+options.url);
-  request(options,parseSummonerFactory(res));
-});
+// app.get('/:region/summoner/:summoner', (req,res) => {
+//   parse.Summoner(req.params.region, req.params.summoner)
+// 		.then((data) => {
+// 			res.send(response.Ok(data))
+// 		})
+// 		.catch((error) => {
+// 			res.send(response.Error(error))
+// 		})
+// })
 
 app.get('/:region/summoner/:summoner/champions', function(req,res) {
   options.url = 'http://'+parseURL(req.params.region)+'.op.gg/summoner/champions/userName='+parseURL(req.params.summoner);

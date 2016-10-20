@@ -10,5 +10,6 @@
 	"INVALID_RESPONSE": "Invalid response received.",
 	"RATE_LIMITED": "Your request was rate limited by the client. Try again later.",
 	"GENERIC_ERROR": "An undiagnosed error has occurred. Create an issue request with the steps to reproduce.",
-	"RIOT_API_ERROR": "Riot API returned an error, this usually means that your API key is incorrect."
+	"RIOT_API_ERROR": "Riot API returned an error, this usually means that your API key is incorrect.",
+	"MISSING_PARAM_REGION": "Region parameter is missing."
 }

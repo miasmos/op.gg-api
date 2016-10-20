@@ -1,5 +1,5 @@
 'use strict'
-let parse = require('./lib/parse'),
+let parse = require('./lib/Parser/Parser'),
     errorMessages = require('./lib/Responses/error_messages.json'),
     responseCodes = require('./lib/Responses/response_codes.json'),
     Error = require('./lib/Responses/Error'),
