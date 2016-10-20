@@ -3,8 +3,10 @@ let express = require('express'),
 	http = require('http'),
 	parse = require('./lib/parse'),
 	validate = require('./lib/validate'),
-	response = require('./lib/response'),
-	error = require('./lib/error.json'),
+	response = require('./lib/Responses/Response'),
+	Error = require('./lib/Responses/Error'),
+	errorMessages = require('./lib/Responses/error_messages.json'),
+	responseCodes = require('./lib/Responses/response_codes.json'),
 	fs = require('fs'),
 	app = express()
 
@@ -12,7 +14,7 @@ app.set('json spaces', 4)
 
 app.param('region', (req,res,next,id) => {
   if (!validate.Region(req.params.region)) {
-    res.json(response.Make(undefined, error.INVALID_PARAM_REGION))
+    res.json(response.Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
     return
   }
   next()
@@ -20,7 +22,7 @@ app.param('region', (req,res,next,id) => {
 
 app.param('summoner', (req,res,next,id) => {
   if (!validate.SummonerName(req.params.summoner)) {
-    res.json(response.Make(undefined, error.INVALID_PARAM_SUMMONER_NAME))
+    res.json(response.Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
     return
   }
   next()
@@ -28,7 +30,7 @@ app.param('summoner', (req,res,next,id) => {
 
 app.param('gamenum', (req,res,next,id) => {
   if (!validate.GameId(req.params.gamenum)) {
-    res.json(response.Make(undefined, error.INVALID_PARAM_GAME_ID))
+    res.json(response.Error(errorMessages.INVALID_PARAM_GAME_ID, responseCodes.BAD_REQUEST))
     return
   }
 	next()
@@ -36,21 +38,21 @@ app.param('gamenum', (req,res,next,id) => {
 
 app.param('summonerId', (req,res,next,id) => {
   if (!validate.SummonerId(req.params.summonerId)) {
-    res.json(response.Make(undefined, error.INVALID_PARAM_SUMMONER_ID))
+    res.json(response.Error(errorMessages.INVALID_PARAM_SUMMONER_ID, responseCodes.BAD_REQUEST))
     return
   }
 	next()
 })
 
 app.use((req, res, next) => {
-	resolve('api_key' in req.query, 'api_key', validate.RiotAPIKey, error.INVALID_API_KEY)
+	resolve('api_key' in req.query, 'api_key', validate.RiotAPIKey, errorMessages.INVALID_API_KEY, responseCodes.BAD_REQUEST)
 
-	function resolve(shouldValidate, querystring, validateFn, error) {
+	function resolve(shouldValidate, querystring, validateFn, errorMessage, errorCode) {
 		if (shouldValidate) {
 			if (validateFn.call(this, req.query[querystring])) {	//validated successfully
 				next()
 			} else {
-				res.json(response.Make(undefined, error))
+				res.json(response.Error(new Error(errorMessage, errorCode)))
 			}
 		} else {
 			next()
@@ -61,21 +63,20 @@ app.use((req, res, next) => {
 app.get('/:region/live', (req,res) => {
 	parse.Live(req.params.region, req.query.api_key)
 		.then((data) => {
-			res.json(response.Make(undefined, data))
+			res.json(response.Ok(data))
 		})
 		.catch((error) => {
-			res.json(response.Make(error, undefined))
+			res.json(response.Error(error))
 		})
 })
 
 app.get('/:region/refresh/:summonerId', (req,res) => {
 	parse.Refresh(req.params.region, req.params.summonerId)
 		.then((data) => {
-			res.send(response.Make(undefined, data))
+			res.send(response.Ok(data))
 		})
 		.catch((error) => {
-			console.log(error)
-			res.send(response.Make(error, undefined))
+			res.send(response.Error(error))
 		})
 })
 
