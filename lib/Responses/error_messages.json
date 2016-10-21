@@ -1,5 +1,6 @@
 {
-	"EMPTY_RESPONSE": "Response is empty, this usually means that the page's DOM structure has been changed.",
+	"NOT_FOUND": "Whoops. That page doesn't exist.",
+	"EMPTY_RESPONSE": "Response is empty, this usually means that the page's DOM structure has changed.",
 	"INVALID_PARAM_REGION": "Invalid region.",
 	"INVALID_PARAM_SUMMONER_NAME": "Invalid summoner name.",
 	"INVALID_PARAMS_GAME_ID": "Invalid game ID.",

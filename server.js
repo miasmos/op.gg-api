@@ -44,6 +44,14 @@ app.param('summonerId', (req,res,next,id) => {
 	next()
 })
 
+app.param('season', (req,res,next,id) => {
+  if (!validate.Season(req.params.season)) {
+    res.json(response.Error(errorMessages.INVALID_PARAM_SEASON, responseCodes.BAD_REQUEST))
+    return
+  }
+	next()
+})
+
 app.use((req, res, next) => {
 	resolve('api_key' in req.query, 'api_key', validate.RiotAPIKey, errorMessages.INVALID_API_KEY, responseCodes.BAD_REQUEST)
 
@@ -80,15 +88,59 @@ app.get('/:region/renew/:summonerId', (req,res) => {
 		})
 })
 
-// app.get('/:region/summoner/:summoner', (req,res) => {
-//   parse.Summoner(req.params.region, req.params.summoner)
-// 		.then((data) => {
-// 			res.send(response.Ok(data))
-// 		})
-// 		.catch((error) => {
-// 			res.send(response.Error(error))
-// 		})
-// })
+app.get('/:region/summary/:summoner/combined', (req,res) => {
+	parse.SummaryCombined(req.params.region, req.params.summoner)
+		.then((data) => {
+			res.send(response.Ok(data))
+		})
+		.catch((error) => {
+			res.send(response.Error(error))
+		})
+})
+
+app.get('/:region/summary/:summoner/ranked', (req,res) => {
+	parse.SummaryRanked(req.params.region, req.params.summoner)
+		.then((data) => {
+			res.send(response.Ok(data))
+		})
+		.catch((error) => {
+			res.send(response.Error(error))
+		})
+})
+
+app.get('/:region/summary/:summoner/normal', (req,res) => {
+	parse.SummaryNormal(req.params.region, req.params.summoner)
+		.then((data) => {
+			res.send(response.Ok(data))
+		})
+		.catch((error) => {
+			res.send(response.Error(error))
+		})
+})
+
+app.get('/:region/champions/:summoner', (req,res) => {
+	parse.Champions(req.params.region, req.params.summoner, 6)
+		.then((data) => {
+			res.send(response.Ok(data))
+		})
+		.catch((error) => {
+			res.send(response.Error(error))
+		})
+})
+
+app.get('/:region/champions/:summoner/:season', (req,res) => {
+	parse.Champions(req.params.region, req.params.summoner, req.params.season)
+		.then((data) => {
+			res.send(response.Ok(data))
+		})
+		.catch((error) => {
+			res.send(response.Error(error))
+		})
+})
+
+app.get('*', (req, res) => {
+	res.json(response.Error(new Error(errorMessages.NOT_FOUND, responseCodes.NOT_FOUND)))
+})
 
 app.get('/:region/summoner/:summoner/champions', function(req,res) {
   options.url = 'http://'+parseURL(req.params.region)+'.op.gg/summoner/champions/userName='+parseURL(req.params.summoner);
