@@ -14,7 +14,7 @@ app.set('json spaces', 4)
 
 app.param('region', (req,res,next,id) => {
   if (!validate.Region(req.params.region)) {
-    res.json(response.Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+    res.json(response.Error(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST)))
     return
   }
   next()
@@ -22,7 +22,7 @@ app.param('region', (req,res,next,id) => {
 
 app.param('summoner', (req,res,next,id) => {
   if (!validate.SummonerName(req.params.summoner)) {
-    res.json(response.Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
+    res.json(response.Error(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST)))
     return
   }
   next()
@@ -30,7 +30,7 @@ app.param('summoner', (req,res,next,id) => {
 
 app.param('gamenum', (req,res,next,id) => {
   if (!validate.GameId(req.params.gamenum)) {
-    res.json(response.Error(errorMessages.INVALID_PARAM_GAME_ID, responseCodes.BAD_REQUEST))
+    res.json(response.Error(new Error(errorMessages.INVALID_PARAM_GAME_ID, responseCodes.BAD_REQUEST)))
     return
   }
 	next()
@@ -38,7 +38,7 @@ app.param('gamenum', (req,res,next,id) => {
 
 app.param('summonerId', (req,res,next,id) => {
   if (!validate.SummonerId(req.params.summonerId)) {
-    res.json(response.Error(errorMessages.INVALID_PARAM_SUMMONER_ID, responseCodes.BAD_REQUEST))
+    res.json(response.Error(new Error(errorMessages.INVALID_PARAM_SUMMONER_ID, responseCodes.BAD_REQUEST)))
     return
   }
 	next()
@@ -46,7 +46,7 @@ app.param('summonerId', (req,res,next,id) => {
 
 app.param('season', (req,res,next,id) => {
   if (!validate.Season(req.params.season)) {
-    res.json(response.Error(errorMessages.INVALID_PARAM_SEASON, responseCodes.BAD_REQUEST))
+    res.json(response.Error(new Error(errorMessages.INVALID_PARAM_SEASON, responseCodes.BAD_REQUEST)))
     return
   }
 	next()
