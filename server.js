@@ -88,15 +88,17 @@ app.get('/:region/renew/:summonerId', (req,res) => {
 		})
 })
 
-app.get('/:region/summary/:summoner/combined', (req,res) => {
-	parse.SummaryCombined(req.params.region, req.params.summoner)
+app.get('/:region/summary/:summoner', SummaryCombined)
+app.get('/:region/summary/:summoner/combined', SummaryCombined)
+function SummaryCombined(req,res) {
+	return parse.SummaryCombined(req.params.region, req.params.summoner)
 		.then((data) => {
 			res.send(response.Ok(data))
 		})
 		.catch((error) => {
 			res.send(response.Error(error))
 		})
-})
+}
 
 app.get('/:region/summary/:summoner/ranked', (req,res) => {
 	parse.SummaryRanked(req.params.region, req.params.summoner)
@@ -118,25 +120,17 @@ app.get('/:region/summary/:summoner/normal', (req,res) => {
 		})
 })
 
-app.get('/:region/champions/:summoner', (req,res) => {
-	parse.Champions(req.params.region, req.params.summoner, 6)
+app.get('/:region/champions/:summoner', Champions)
+app.get('/:region/champions/:summoner/:season', Champions)
+function Champions(req,res) {
+	return parse.Champions(req.params.region, req.params.summoner, req.params.season ? req.params.season : 6)
 		.then((data) => {
 			res.send(response.Ok(data))
 		})
 		.catch((error) => {
 			res.send(response.Error(error))
 		})
-})
-
-app.get('/:region/champions/:summoner/:season', (req,res) => {
-	parse.Champions(req.params.region, req.params.summoner, req.params.season)
-		.then((data) => {
-			res.send(response.Ok(data))
-		})
-		.catch((error) => {
-			res.send(response.Error(error))
-		})
-})
+}
 
 app.get('*', (req, res) => {
 	res.json(response.Error(new Error(errorMessages.NOT_FOUND, responseCodes.NOT_FOUND)))
