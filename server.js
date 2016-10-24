@@ -132,21 +132,19 @@ function Champions(req,res) {
 		})
 }
 
+app.get('/:region/league/:summoner', (req,res) => {
+	return parse.League(req.params.region, req.params.summoner)
+		.then((data) => {
+			res.send(response.Ok(data))
+		})
+		.catch((error) => {
+			res.send(response.Error(error))
+		})
+})
+
 app.get('*', (req, res) => {
 	res.json(response.Error(new Error(errorMessages.NOT_FOUND, responseCodes.NOT_FOUND)))
 })
-
-app.get('/:region/summoner/:summoner/champions', function(req,res) {
-  options.url = 'http://'+parseURL(req.params.region)+'.op.gg/summoner/champions/userName='+parseURL(req.params.summoner);
-  console.log("parsing "+options.url);
-  request(options,parseSummonerChampionsFactory(res));
-});
-
-app.get('/:region/summoner/:summoner/league', function(req,res) {
-  options.url = 'http://'+parseURL(req.params.region)+'.op.gg/summoner/league/userName='+parseURL(req.params.summoner);
-  console.log("parsing "+options.url);
-  request(options,parseSummonerLeagueFactory(res));
-});
 
 app.get('/:region/league', function(req,res) {
   options.url = 'http://'+parseURL(req.params.region)+'.op.gg/ranking/ladder';
