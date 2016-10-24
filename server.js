@@ -52,6 +52,14 @@ app.param('season', (req,res,next,id) => {
 	next()
 })
 
+app.param('timestamp', (req,res,next,id) => {
+  if (!validate.Timestamp(req.params.timestamp)) {
+    res.json(response.Error(new Error(errorMessages.INVALID_PARAM_TIMESTAMP, responseCodes.BAD_REQUEST)))
+    return
+  }
+	next()
+})
+
 app.use((req, res, next) => {
 	resolve('api_key' in req.query, 'api_key', validate.RiotAPIKey, errorMessages.INVALID_API_KEY, responseCodes.BAD_REQUEST)
 
@@ -142,21 +150,29 @@ app.get('/:region/league/:summoner', (req,res) => {
 		})
 })
 
+app.get('/:region/matches/:summoner/', (req, res) => {
+	return parse.Matches(req.params.region, req.params.summoner)
+		.then((data) => {
+			res.send(response.Ok(data))
+		})
+		.catch((error) => {
+			res.send(response.Error(error))
+		})
+})
+
+app.get('/:region/matches/:summoner/:timestamp', (req,res) => {
+	return parse.MatchesByTimestamp(req.params.region, req.params.summoner, req.params.timestamp)
+		.then((data) => {
+			res.send(response.Ok(data))
+		})
+		.catch((error) => {
+			res.send(response.Error(error))
+		})
+})
+
 app.get('*', (req, res) => {
 	res.json(response.Error(new Error(errorMessages.NOT_FOUND, responseCodes.NOT_FOUND)))
 })
-
-app.get('/:region/league', function(req,res) {
-  options.url = 'http://'+parseURL(req.params.region)+'.op.gg/ranking/ladder';
-  console.log("parsing "+options.url);
-  request(options,parseLeagueFactory(res));
-});
-
-app.get('/:region/pro', function(req, res) {
-  options.url = 'http://'+parseURL(req.params.region)+'.op.gg/spectate/list';
-  console.log("parsing "+options.url);
-  request(options,parseSpectateListProFactory(res)); 
-});
 
 app.get('/:region/amateur', function(req, res) {
   options.url = 'http://'+parseURL(req.params.region)+'.op.gg/spectate/list';

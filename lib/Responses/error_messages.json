@@ -6,6 +6,7 @@
 	"INVALID_PARAMS_GAME_ID": "Invalid game ID.",
 	"INVALID_PARAM_SUMMONER_ID": "Invalid summoner ID.",
 	"INVALID_PARAM_SEASON": "Invalid season.",
+	"INVALID_PARAM_TIMESTAMP": "Invalid timestamp.",
 	"API_KEY_MISSING": "Riot API key is missing.",
 	"INVALID_API_KEY": "Riot API key is invalid.",
 	"PARSE_FAILED": "Failed to parse HTML.",
