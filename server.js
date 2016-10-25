@@ -105,6 +105,20 @@ app.use((req, res, next) => {
 			error: errorMessages.INVALID_PARAM_STATS_QUEUE,
 			code: responseCodes.BAD_REQUEST
 		},
+		{
+			shouldValidate: 'championName' in req.query && utils.IsEndpoint('/analytics/champion', req.path),
+			querystring: 'championName',
+			function: validate.ChampionName,
+			error: errorMessages.INVALID_PARAM_CHAMPION_NAME,
+			code: responseCodes.BAD_REQUEST
+		},
+		{
+			shouldValidate: 'role' in req.query && utils.IsEndpoint('/analytics/champion', req.path),
+			querystring: 'role',
+			function: validate.Role,
+			error: errorMessages.INVALID_PARAM_ROLE,
+			code: responseCodes.BAD_REQUEST
+		},
 	]
 
 	for (var param in params) {
@@ -215,6 +229,26 @@ app.get('/:region/matches/:summoner/:timestamp', (req,res) => {
 
 app.get('/:region/stats/', (req, res) => {
 	return parse.Stats(req.params.region, req.query.type, req.query.league, req.query.period, req.query.mapId, req.query.queue)
+		.then((data) => {
+			res.send(response.Ok(data))
+		})
+		.catch((error) => {
+			res.send(response.Error(error))
+		})
+})
+
+app.get('/:region/analytics/summary', (req, res) => {
+	return parse.Analytics(req.params.region)
+		.then((data) => {
+			res.send(response.Ok(data))
+		})
+		.catch((error) => {
+			res.send(response.Error(error))
+		})
+})
+
+app.get('/:region/analytics/champion', (req, res) => {
+	return parse.AnalyticsByChampion(req.params.region, req.query.championName, req.query.role)
 		.then((data) => {
 			res.send(response.Ok(data))
 		})
