@@ -4,6 +4,7 @@ let express = require('express'),
 	parse = require('./lib/Parser/Parser'),
 	validate = require('./lib/validate'),
 	response = require('./lib/Responses/Response'),
+	utils = require('./lib/utils'),
 	Error = require('./lib/Responses/Error'),
 	errorMessages = require('./lib/Responses/error_messages.json'),
 	responseCodes = require('./lib/Responses/response_codes.json'),
@@ -61,19 +62,61 @@ app.param('timestamp', (req,res,next,id) => {
 })
 
 app.use((req, res, next) => {
-	resolve('api_key' in req.query, 'api_key', validate.RiotAPIKey, errorMessages.INVALID_API_KEY, responseCodes.BAD_REQUEST)
+	var params = [
+		{
+			shouldValidate: 'api_key' in req.query,
+			querystring: 'api_key',
+			function: validate.RiotAPIKey,
+			error: errorMessages.INVALID_API_KEY,
+			code: responseCodes.BAD_REQUEST
+		},
+		{
+			shouldValidate: 'type' in req.query && utils.IsEndpoint('/:region/stats', req.path),
+			querystring: 'type',
+			function: validate.StatsGraphType,
+			error: errorMessages.INVALID_PARAM_STATS_GRAPH_TYPE,
+			code: responseCodes.BAD_REQUEST
+		},
+		{
+			shouldValidate: 'league' in req.query && utils.IsEndpoint('/:region/stats', req.path),
+			querystring: 'league',
+			function: validate.StatsLeague,
+			error: errorMessages.INVALID_PARAM_STATS_LEAGUE,
+			code: responseCodes.BAD_REQUEST
+		},
+		{
+			shouldValidate: 'period' in req.query && utils.IsEndpoint('/:region/stats', req.path),
+			querystring: 'period',
+			function: validate.StatsPeriod,
+			error: errorMessages.INVALID_PARAM_STATS_PERIOD,
+			code: responseCodes.BAD_REQUEST
+		},
+		{
+			shouldValidate: 'mapId' in req.query && utils.IsEndpoint('/:region/stats', req.path),
+			querystring: 'mapId',
+			function: validate.StatsMap,
+			error: errorMessages.INVALID_PARAM_STATS_MAP,
+			code: responseCodes.BAD_REQUEST
+		},
+		{
+			shouldValidate: 'queue' in req.query && utils.IsEndpoint('/:region/stats', req.path),
+			querystring: 'queue',
+			function: validate.StatsQueueType,
+			error: errorMessages.INVALID_PARAM_STATS_QUEUE,
+			code: responseCodes.BAD_REQUEST
+		},
+	]
 
-	function resolve(shouldValidate, querystring, validateFn, errorMessage, errorCode) {
-		if (shouldValidate) {
-			if (validateFn.call(this, req.query[querystring])) {	//validated successfully
-				next()
-			} else {
-				res.json(response.Error(new Error(errorMessage, errorCode)))
+	for (var param in params) {
+		var obj = params[param]
+		if (obj.shouldValidate) {
+			if (!obj.function.call(this, req.query[obj.querystring])) {
+				res.json(response.Error(new Error(obj.error, obj.code)))
+				return
 			}
-		} else {
-			next()
 		}
 	}
+	next()
 })
 
 app.get('/:region/live', (req,res) => {
@@ -171,7 +214,7 @@ app.get('/:region/matches/:summoner/:timestamp', (req,res) => {
 })
 
 app.get('/:region/stats/', (req, res) => {
-	return parse.Stats(req.params.region)
+	return parse.Stats(req.params.region, req.query.type, req.query.league, req.query.period, req.query.mapId, req.query.queue)
 		.then((data) => {
 			res.send(response.Ok(data))
 		})
