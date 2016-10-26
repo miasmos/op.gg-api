@@ -143,8 +143,8 @@ app.get('/:region/live', (req,res) => {
 		})
 })
 
-app.get('/:region/renew/:summonerId', (req,res) => {
-	parse.Renew(req.params.region, req.params.summonerId)
+app.get('/:region/renew', (req,res) => {
+	parse.Renew(req.params.region, req.query.summonerId)
 		.then((data) => {
 			res.send(response.Ok(data))
 		})
@@ -185,17 +185,15 @@ app.get('/:region/summary/:summoner/normal', (req,res) => {
 		})
 })
 
-app.get('/:region/champions/:summoner', Champions)
-app.get('/:region/champions/:summoner/:season', Champions)
-function Champions(req,res) {
-	return parse.Champions(req.params.region, req.params.summoner, req.params.season ? req.params.season : 6)
+app.get('/:region/champions/:summoner', (req,res) => {
+	return parse.Champions(req.params.region, req.params.summoner, req.query.season ? req.query.season : 6)
 		.then((data) => {
 			res.send(response.Ok(data))
 		})
 		.catch((error) => {
 			res.send(response.Error(error))
 		})
-}
+})
 
 app.get('/:region/league/:summoner', (req,res) => {
 	return parse.League(req.params.region, req.params.summoner)

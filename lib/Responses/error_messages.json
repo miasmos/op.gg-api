@@ -24,5 +24,6 @@
 	"RIOT_API_ERROR": "Riot API returned an error, this usually means that your API key is incorrect.",
 	"MISSING_PARAM_REGION": "Region parameter is missing.",
 	"MISSING_PARAM_GENERIC": "An expected parameter is missing.",
-	"NO_RESULTS": "The request was made, but returned no results."
+	"NO_RESULTS": "The request was made, but returned no results.",
+	"SERVICE_UNAVAILABLE": "The requested service is unavailable. It is either down or slow to respond."
 }
