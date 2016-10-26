@@ -106,8 +106,8 @@ app.use((req, res, next) => {
 			code: responseCodes.BAD_REQUEST
 		},
 		{
-			shouldValidate: 'championName' in req.query && utils.IsEndpoint('/analytics/champion', req.path),
-			querystring: 'championName',
+			shouldValidate: 'name' in req.query && utils.IsEndpoint('/analytics/champion', req.path),
+			querystring: 'name',
 			function: validate.ChampionName,
 			error: errorMessages.INVALID_PARAM_CHAMPION_NAME,
 			code: responseCodes.BAD_REQUEST
@@ -248,7 +248,7 @@ app.get('/:region/analytics/summary', (req, res) => {
 })
 
 app.get('/:region/analytics/champion', (req, res) => {
-	return parse.AnalyticsByChampion(req.params.region, req.query.championName, req.query.role)
+	return parse.AnalyticsByChampion(req.params.region, req.query.name, req.query.role)
 		.then((data) => {
 			res.send(response.Ok(data))
 		})
