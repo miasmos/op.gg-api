@@ -265,6 +265,16 @@ app.get('/:region/analytics/champion/items', (req, res) => {
 		})
 })
 
+app.get('/:region/analytics/champion/skills', (req, res) => {
+	return parse.AnalyticsByChampionSkills(req.params.region, req.query.champion, req.query.role)
+		.then((data) => {
+			res.send(response.Ok(data))
+		})
+		.catch((error) => {
+			res.send(response.Error(error))
+		})
+})
+
 app.get('*', (req, res) => {
 	res.json(response.Error(new Error(errorMessages.NOT_FOUND, responseCodes.NOT_FOUND)))
 })
