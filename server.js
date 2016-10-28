@@ -205,6 +205,26 @@ app.get('/:region/league/:summoner', (req,res) => {
 		})
 })
 
+app.get('/:region/runes/:summoner/', (req, res) => {
+	return parse.Runes(req.params.region, req.params.summoner)
+		.then((data) => {
+			res.send(response.Ok(data))
+		})
+		.catch((error) => {
+			res.send(response.Error(error))
+		})
+})
+
+app.get('/:region/masteries/:summoner/', (req, res) => {
+	return parse.Masteries(req.params.region, req.params.summoner)
+		.then((data) => {
+			res.send(response.Ok(data))
+		})
+		.catch((error) => {
+			res.send(response.Error(error))
+		})
+})
+
 app.get('/:region/matches/:summoner/', (req, res) => {
 	return parse.Matches(req.params.region, req.params.summoner)
 		.then((data) => {
