@@ -119,6 +119,13 @@ app.use((req, res, next) => {
 			error: errorMessages.INVALID_PARAM_ROLE,
 			code: responseCodes.BAD_REQUEST
 		},
+		{
+			shouldValidate: 'gameId' in req.query && utils.IsEndpoint('/match/:summoner', req.path),
+			querystring: 'gameId',
+			function: validate.GameId,
+			error: errorMessages.INVALID_PARAM_GAME_ID,
+			code: responseCodes.BAD_REQUEST
+		},
 	]
 
 	for (var param in params) {
@@ -227,6 +234,16 @@ app.get('/:region/masteries/:summoner/', (req, res) => {
 
 app.get('/:region/matches/:summoner/', (req, res) => {
 	return parse.Matches(req.params.region, req.params.summoner)
+		.then((data) => {
+			res.send(response.Ok(data))
+		})
+		.catch((error) => {
+			res.send(response.Error(error))
+		})
+})
+
+app.get('/:region/match/:gameId/', (req,res) => {
+	return parse.Match(req.params.region, req.query.summoner, req.params.gameId)
 		.then((data) => {
 			res.send(response.Ok(data))
 		})

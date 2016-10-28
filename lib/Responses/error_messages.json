@@ -3,7 +3,7 @@
 	"EMPTY_RESPONSE": "Response is empty, this usually means that the page's DOM structure has changed.",
 	"INVALID_PARAM_REGION": "Invalid region.",
 	"INVALID_PARAM_SUMMONER_NAME": "Invalid summoner name.",
-	"INVALID_PARAMS_GAME_ID": "Invalid game ID.",
+	"INVALID_PARAM_GAME_ID": "Invalid game ID.",
 	"INVALID_PARAM_SUMMONER_ID": "Invalid summoner ID.",
 	"INVALID_PARAM_SEASON": "Invalid season.",
 	"INVALID_PARAM_TIMESTAMP": "Invalid timestamp.",
