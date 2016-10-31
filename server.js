@@ -15,7 +15,7 @@ app.set('json spaces', 4)
 
 app.param('region', (req,res,next,id) => {
   if (!validate.Region(req.params.region)) {
-    res.json(response.Error(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST)))
+    response.Error(res, new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
     return
   }
   next()
@@ -23,7 +23,7 @@ app.param('region', (req,res,next,id) => {
 
 app.param('summoner', (req,res,next,id) => {
   if (!validate.SummonerName(req.params.summoner)) {
-    res.json(response.Error(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST)))
+    response.Error(res, new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
     return
   }
   next()
@@ -31,7 +31,7 @@ app.param('summoner', (req,res,next,id) => {
 
 app.param('gamenum', (req,res,next,id) => {
   if (!validate.GameId(req.params.gamenum)) {
-    res.json(response.Error(new Error(errorMessages.INVALID_PARAM_GAME_ID, responseCodes.BAD_REQUEST)))
+    response.Error(res, new Error(errorMessages.INVALID_PARAM_GAME_ID, responseCodes.BAD_REQUEST))
     return
   }
 	next()
@@ -39,7 +39,7 @@ app.param('gamenum', (req,res,next,id) => {
 
 app.param('summonerId', (req,res,next,id) => {
   if (!validate.SummonerId(req.params.summonerId)) {
-    res.json(response.Error(new Error(errorMessages.INVALID_PARAM_SUMMONER_ID, responseCodes.BAD_REQUEST)))
+    response.Error(res, new Error(errorMessages.INVALID_PARAM_SUMMONER_ID, responseCodes.BAD_REQUEST))
     return
   }
 	next()
@@ -47,7 +47,7 @@ app.param('summonerId', (req,res,next,id) => {
 
 app.param('season', (req,res,next,id) => {
   if (!validate.Season(req.params.season)) {
-    res.json(response.Error(new Error(errorMessages.INVALID_PARAM_SEASON, responseCodes.BAD_REQUEST)))
+    response.Error(res, new Error(errorMessages.INVALID_PARAM_SEASON, responseCodes.BAD_REQUEST))
     return
   }
 	next()
@@ -55,13 +55,14 @@ app.param('season', (req,res,next,id) => {
 
 app.param('timestamp', (req,res,next,id) => {
   if (!validate.Timestamp(req.params.timestamp)) {
-    res.json(response.Error(new Error(errorMessages.INVALID_PARAM_TIMESTAMP, responseCodes.BAD_REQUEST)))
+    response.Error(res, new Error(errorMessages.INVALID_PARAM_TIMESTAMP, responseCodes.BAD_REQUEST))
     return
   }
 	next()
 })
 
 app.use((req, res, next) => {
+	//filter query strings and return an error if they don't validate
 	var params = [
 		{
 			shouldValidate: 'api_key' in req.query,
@@ -126,13 +127,20 @@ app.use((req, res, next) => {
 			error: errorMessages.INVALID_PARAM_GAME_ID,
 			code: responseCodes.BAD_REQUEST
 		},
+		{
+			shouldValidate: 'start' in req.query && utils.IsEndpoint('/:region/matches/:summoner', req.path),
+			querystring: 'start',
+			function: validate.Timestamp,
+			error: errorMessages.INVALID_PARAM_TIMESTAMP,
+			code: responseCodes.BAD_REQUEST
+		},
 	]
 
 	for (var param in params) {
 		var obj = params[param]
 		if (obj.shouldValidate) {
 			if (!obj.function.call(this, req.query[obj.querystring])) {
-				res.json(response.Error(new Error(obj.error, obj.code)))
+				response.Error(res, new Error(obj.error, obj.code))
 				return
 			}
 		}
@@ -143,20 +151,20 @@ app.use((req, res, next) => {
 app.get('/:region/live', (req,res) => {
 	parse.Live(req.params.region, req.query.api_key)
 		.then((data) => {
-			res.json(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.json(response.Error(error))
+			response.Error(res, error)
 		})
 })
 
 app.get('/:region/renew', (req,res) => {
 	parse.Renew(req.params.region, req.query.summonerId)
 		.then((data) => {
-			res.send(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.send(response.Error(error))
+			response.Error(res, error)
 		})
 })
 
@@ -165,175 +173,175 @@ app.get('/:region/summary/:summoner/combined', SummaryCombined)
 function SummaryCombined(req,res) {
 	return parse.SummaryCombined(req.params.region, req.params.summoner)
 		.then((data) => {
-			res.send(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.send(response.Error(error))
+			response.Error(res, error)
 		})
 }
 
 app.get('/:region/summary/:summoner/ranked', (req,res) => {
 	parse.SummaryRanked(req.params.region, req.params.summoner)
 		.then((data) => {
-			res.send(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.send(response.Error(error))
+			response.Error(res, error)
 		})
 })
 
 app.get('/:region/summary/:summoner/normal', (req,res) => {
 	parse.SummaryNormal(req.params.region, req.params.summoner)
 		.then((data) => {
-			res.send(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.send(response.Error(error))
+			response.Error(res, error)
 		})
 })
 
 app.get('/:region/champions/:summoner', (req,res) => {
 	return parse.Champions(req.params.region, req.params.summoner, req.query.season ? req.query.season : 6)
 		.then((data) => {
-			res.send(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.send(response.Error(error))
+			response.Error(res, error)
 		})
 })
 
 app.get('/:region/league/:summoner', (req,res) => {
 	return parse.League(req.params.region, req.params.summoner)
 		.then((data) => {
-			res.send(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.send(response.Error(error))
+			response.Error(res, error)
 		})
 })
 
 app.get('/:region/runes/:summoner/', (req, res) => {
 	return parse.Runes(req.params.region, req.params.summoner)
 		.then((data) => {
-			res.send(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.send(response.Error(error))
+			response.Error(res, error)
 		})
 })
 
 app.get('/:region/masteries/:summoner/', (req, res) => {
 	return parse.Masteries(req.params.region, req.params.summoner)
 		.then((data) => {
-			res.send(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.send(response.Error(error))
+			response.Error(res, error)
 		})
 })
 
 app.get('/:region/matches/:summoner/', (req, res) => {
-	return parse.Matches(req.params.region, req.params.summoner)
+	if ('start' in req.query) {
+		return parse.MatchesByTimestamp(req.params.region, req.params.summoner, req.query.start)
 		.then((data) => {
-			res.send(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.send(response.Error(error))
+			response.Error(res, error)
 		})
+	} else {
+		return parse.Matches(req.params.region, req.params.summoner)
+			.then((data) => {
+				response.Ok(res, data)
+			})
+			.catch((error) => {
+				response.Error(res, error)
+			})
+		}
 })
 
 app.get('/:region/match/:gameId/', (req,res) => {
 	return parse.Match(req.params.region, req.query.summoner, req.params.gameId)
 		.then((data) => {
-			res.send(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.send(response.Error(error))
-		})
-})
-
-app.get('/:region/matches/:summoner/:timestamp', (req,res) => {
-	return parse.MatchesByTimestamp(req.params.region, req.params.summoner, req.params.timestamp)
-		.then((data) => {
-			res.send(response.Ok(data))
-		})
-		.catch((error) => {
-			res.send(response.Error(error))
+			response.Error(res, error)
 		})
 })
 
 app.get('/:region/stats/', (req, res) => {
 	return parse.Stats(req.params.region, req.query.type, req.query.league, req.query.period, req.query.mapId, req.query.queue)
 		.then((data) => {
-			res.send(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.send(response.Error(error))
+			response.Error(res, error)
 		})
 })
 
 app.get('/:region/analytics/summary', (req, res) => {
 	return parse.Analytics(req.params.region)
 		.then((data) => {
-			res.send(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.send(response.Error(error))
+			response.Error(res, error)
 		})
 })
 
 app.get('/:region/analytics/champion', (req, res) => {
 	return parse.AnalyticsByChampion(req.params.region, req.query.champion, req.query.role)
 		.then((data) => {
-			res.send(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.send(response.Error(error))
+			response.Error(res, error)
 		})
 })
 
 app.get('/:region/analytics/champion/items', (req, res) => {
 	return parse.AnalyticsByChampionItems(req.params.region, req.query.champion, req.query.role)
 		.then((data) => {
-			res.send(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.send(response.Error(error))
+			response.Error(res, error)
 		})
 })
 
 app.get('/:region/analytics/champion/skills', (req, res) => {
 	return parse.AnalyticsByChampionSkills(req.params.region, req.query.champion, req.query.role)
 		.then((data) => {
-			res.send(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.send(response.Error(error))
+			response.Error(res, error)
 		})
 })
 
 app.get('/:region/analytics/champion/runes', (req, res) => {
 	return parse.AnalyticsByChampionRunes(req.params.region, req.query.champion, req.query.role)
 		.then((data) => {
-			res.send(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.send(response.Error(error))
+			response.Error(res, error)
 		})
 })
 
 app.get('/:region/analytics/champion/masteries', (req, res) => {
 	return parse.AnalyticsByChampionMasteries(req.params.region, req.query.champion, req.query.role)
 		.then((data) => {
-			res.send(response.Ok(data))
+			response.Ok(res, data)
 		})
 		.catch((error) => {
-			res.send(response.Error(error))
+			response.Error(res, error)
 		})
 })
 
 app.get('*', (req, res) => {
-	res.json(response.Error(new Error(errorMessages.NOT_FOUND, responseCodes.NOT_FOUND)))
+	response.Error(res, new Error(errorMessages.NOT_FOUND, responseCodes.NOT_FOUND))
 })
 
 http.createServer(app).listen(1337, function() {
