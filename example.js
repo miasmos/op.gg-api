@@ -7,3 +7,7 @@ gg.Live('kr')
 	.catch((error) => {
 		console.error(error)
 	})
+
+gg.Live('kr', function(error, data) {
+	console.log(error || data)
+})
