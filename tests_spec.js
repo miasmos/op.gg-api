@@ -757,3 +757,74 @@ frisby.create('/:region/analytics/champion/masteries')
 		"id": Number
 	})
 	.toss()
+
+frisby.create('/:region/match/:matchId')
+	.get(`${base}/na/match/2330709500?summoner=Doublelift`)
+	.expectStatus(200)
+	.expectJSONTypes('data.team1', {
+		"players": Array,
+		"result": String,
+		"color": String,
+		"kills": Number,
+		"deaths": Number,
+		"assists": Number,
+		"barons": Number,
+		"dragons": Number,
+		"towers": Number
+	})
+	.expectJSONTypes('data.team2', {
+		"players": Array,
+		"result": String,
+		"color": String,
+		"kills": Number,
+		"deaths": Number,
+		"assists": Number,
+		"barons": Number,
+		"dragons": Number,
+		"towers": Number
+	})
+	.expectJSONTypes('data.team1.players.?', {
+		"champion": String,
+		"level": Number,
+		"spells": {
+			"spell1Name": String,
+			"spell1Image": String,
+			"spell2Name": String,
+			"spell2Image": String
+		},
+		"keystone": {
+			"name": String,
+			"image": String,
+			"id": Number
+		},
+		"name": String,
+		"items": Array
+	})
+	.expectJSONTypes('data.team1.players.0.items.?', {
+		"name": String,
+		"image": String,
+		"id": Number
+	})
+	.expectJSONTypes('data.team2.players.?', {
+		"champion": String,
+		"level": Number,
+		"spells": {
+			"spell1Name": String,
+			"spell1Image": String,
+			"spell2Name": String,
+			"spell2Image": String
+		},
+		"keystone": {
+			"name": String,
+			"image": String,
+			"id": Number
+		},
+		"name": String,
+		"items": Array
+	})
+	.expectJSONTypes('data.team2.players.0.items.?', {
+		"name": String,
+		"image": String,
+		"id": Number
+	})
+	.toss()

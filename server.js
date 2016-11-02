@@ -134,6 +134,13 @@ app.use((req, res, next) => {
 			error: errorMessages.INVALID_PARAM_TIMESTAMP,
 			code: responseCodes.BAD_REQUEST
 		},
+		{
+			shouldValidate: 'summoner' in req.query && utils.IsEndpoint('/:region/match/:gameId', req.path),
+			querystring: 'summoner',
+			function: validate.SummonerName,
+			error: errorMessages.INVALID_PARAM_SUMMONER_NAME,
+			code: responseCodes.BAD_REQUEST
+		},
 	]
 
 	for (var param in params) {
