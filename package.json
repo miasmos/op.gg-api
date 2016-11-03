@@ -1,6 +1,6 @@
 {
   "name": "op.gg-api",
-  "version": "1.0.0",
+  "version": "2.0.0-alpha",
   "description": "Parses live op.gg pages into json endpoints",
   "main": "server.js",
   "dependencies": {
@@ -16,7 +16,7 @@
     "frisby": "^0.8.5"
   },
   "scripts": {
-    "test": "node server.js && jasmine-node tests_spec.js",
+    "test": "jasmine-node tests_spec.js",
     "start": "node server.js"
   },
   "repository": {
