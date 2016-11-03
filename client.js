@@ -1,83 +1,591 @@
-var request = require('request');
+'use strict'
+let parse = require('./lib/Parser/Parser'),
+    errorMessages = require('./lib/Responses/error_messages.json'),
+    responseCodes = require('./lib/Responses/response_codes.json'),
+    Error = require('./lib/Responses/Error'),
+    response = require('./lib/Responses/Response'),
+    validate = require('./lib/validate'),
+    Promise = require('bluebird')
 
-function opggClient(opts) {
-  this.opts = {
-    url: '',
-    port: '1337',
-    host: '127.0.0.1',
-    headers: {
-      'Content-Type': 'application/json',
-      'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36',
-      'Accept-Language': 'en-GB,en-US;q=0.8,en;q=0.6'
-    }
-  };
-  if (typeof opts !== 'undefined') {if (typeof(opts.host) !== 'undefined') {this.opts.host = opts.host}}
-}
 
-opggClient.prototype.request = function(url, callback) {
-  var options = this.opts;
-  options.url = url;
+module.exports = class opgg {
+  constructor(opts) {
+    if (!opts) opts = {}
+    this.api_key = opts.api_key ? opts.api_key : undefined
+    if (!!this.api_key && !validate.RiotAPIKey(this.api_key)) throw new Error(error.INVALID_API_KEY)
+  }
 
-  request(options, function(error, res, body) {
-    if (error) {
-      callback({'status':'error','error':error+' when connecting to op.gg-api server'});
-      return;
-    } else {
-      var json = JSON.parse(body);
-      if (typeof json.status === 'undefined') {
-        callback({'status':'error','error':'return was not json, wtf'});
-        return;
+  Live(region, callback) {
+    let validated = validate.Region(region)
+
+    if (typeof callback === 'function') {
+      if (!validated) {
+        callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+      } else {
+        parse.Live(region, this.api_key)
+          .then((json) => {
+            callback(undefined, json)
+          })
+          .catch((error) => {
+            callback(error, undefined)
+          })
       }
-      callback(json);
+    } else {
+      return new Promise((resolve, reject) => {
+          if (!validated) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+          else resolve(parse.Live(region, this.api_key))
+      })
     }
-  });
-}
+  }
 
-/* Public Methods */
-opggClient.prototype.Live = function(region, callback){
-  var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/live';
-  this.request(url,callback);
-}
+  Renew(region, summonerId, callback) {
+    let validated = {
+      region: validate.Region(region),
+      summonerId: validate.SummonerId(summonerId)
+    }
 
-opggClient.prototype.Summoner = function(region, summoner, callback){
-  var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/summoner/'+summoner;
-  this.request(url,callback);
-}
+    if (typeof callback === 'function') {
+      if (!validated.region) {
+        callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+      } else if (!validated.summonerId) {
+        callback(new Error(errorMessages.INVALID_PARAM_SUMMONER_ID, responseCodes.BAD_REQUEST), undefined)
+      } else {
+        parse.Renew(region, summonerId, this.api_key)
+          .then((json) => {
+            callback(undefined, json)
+          })
+          .catch((error) => {
+            callback(error, undefined)
+          })
+      }
+    } else {
+      return new Promise((resolve, reject) => {
+          if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+          else if (!validated.summonerId) reject(new Error(errorMessages.INVALID_PARAM_SUMMONER_ID, responseCodes.BAD_REQUEST))
+          else resolve(parse.Renew(region, summonerId, this.api_key))
+      })
+    }
+  }
 
-opggClient.prototype.SummonerChampions = function(region, summoner, callback){
-  var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/summoner/'+summoner+'/champions';
-  this.request(url,callback);
-}
+  Summary(region, summoner, callback) {
+    let validated = {
+      region: validate.Region(region),
+      summoner: validate.Summoner(summoner)
+    }
 
-opggClient.prototype.SummonerLeague = function(region, summoner, callback){
-  var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/summoner/'+summoner+'/league';
-  this.request(url,callback);
-}
+    if (typeof callback === 'function') {
+      if (!validated.region) {
+        callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+      } else if (!validated.summoner) {
+        callback(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST), undefined)
+      } else {
+        parse.SummaryCombined(region, summoner, this.api_key)
+          .then((json) => {
+            callback(undefined, json)
+          })
+          .catch((error) => {
+            callback(error, undefined)
+          })
+      }
+    } else {
+      return new Promise((resolve, reject) => {
+          if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+          else if (!validated.summoner) reject(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
+          else resolve(parse.Renew(region, summonerId, this.api_key))
+      })
+    }
+  }
 
-opggClient.prototype.League = function(region, callback){
-  var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/league';
-  this.request(url,callback);
-}
+  SummaryRanked(region, summoner, callback) {
+    let validated = {
+      region: validate.Region(region),
+      summoner: validate.Summoner(summoner)
+    }
 
-opggClient.prototype.GetReplay = function(region, game, callback){
-  var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/spectate/download/'+game;
-  this.request(url,callback);
-}
+    if (typeof callback === 'function') {
+      if (!validated.region) {
+        callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+      } else if (!validated.summoner) {
+        callback(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST), undefined)
+      } else {
+        parse.SummaryRanked(region, summoner, this.api_key)
+          .then((json) => {
+            callback(undefined, json)
+          })
+          .catch((error) => {
+            callback(error, undefined)
+          })
+      }
+    } else {
+      return new Promise((resolve, reject) => {
+          if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+          else if (!validated.summoner) reject(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
+          else resolve(parse.SummaryRanked(region, summoner, this.api_key))
+      })
+    }
+  }
 
-opggClient.prototype.ProPlayers = function(region, callback){
-  var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/pro';
-  this.request(url,callback);
-}
+  SummaryNormal(region, summoner, callback) {
+    let validated = {
+      region: validate.Region(region),
+      summoner: validate.Summoner(summoner)
+    }
 
-opggClient.prototype.AmateurPlayers = function(region, callback){
-  var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/amateur';
-  this.request(url,callback);
-}
+    if (typeof callback === 'function') {
+      if (!validated.region) {
+        callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+      } else if (!validated.summoner) {
+        callback(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST), undefined)
+      } else {
+        parse.SummaryNormal(region, summoner, this.api_key)
+          .then((json) => {
+            callback(undefined, json)
+          })
+          .catch((error) => {
+            callback(error, undefined)
+          })
+      }
+    } else {
+      return new Promise((resolve, reject) => {
+          if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+          else if (!validated.summoner) reject(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
+          else resolve(parse.SummaryNormal(region, summoner, this.api_key))
+      })
+    }
+  }
 
-opggClient.prototype.Refresh = function(region, summonerId, callback){
-  var url = 'http://'+this.opts.host+':'+this.opts.port+'/'+region+'/refresh/'+summonerId;
-  this.request(url,callback);
-}
-/* End Public Methods */
+  Champions(region, summoner, season, callback) {
+    let validated = {
+      region: validate.Region(region),
+      summoner: validate.Summoner(summoner),
+      season: validate.Season(season)
+    }
 
-module.exports = opggClient;
+    if (typeof callback === 'function') {
+      if (!validated.region) {
+        callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+      } else if (!validated.summoner) {
+        callback(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST), undefined)
+      } else {
+        parse.Champions(region, summoner, season, this.api_key)
+          .then((json) => {
+            callback(undefined, json)
+          })
+          .catch((error) => {
+            callback(error, undefined)
+          })
+      }
+    } else {
+      return new Promise((resolve, reject) => {
+          if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+          else if (!validated.summoner) reject(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
+          else if (!validated.season) reject(new Error(errorMessages.INVALID_PARAM_SEASON, responseCodes.BAD_REQUEST))
+          else resolve(parse.Champions(region, summoner, season, this.api_key))
+      })
+    }
+  }
+
+  League(region, summoner, callback) {
+    let validated = {
+      region: validate.Region(region),
+      summoner: validate.Summoner(summoner)
+    }
+
+    if (typeof callback === 'function') {
+      if (!validated.region) {
+        callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+      } else if (!validated.summoner) {
+        callback(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST), undefined)
+      } else {
+        parse.League(region, summoner, this.api_key)
+          .then((json) => {
+            callback(undefined, json)
+          })
+          .catch((error) => {
+            callback(error, undefined)
+          })
+      }
+    } else {
+      return new Promise((resolve, reject) => {
+          if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+          else if (!validated.summoner) reject(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
+          else resolve(parse.League(region, summoner, this.api_key))
+      })
+    }
+  }
+
+  Runes(region, summoner, callback) {
+    let validated = {
+      region: validate.Region(region),
+      summoner: validate.SummonerName(summoner)
+    }
+
+    if (typeof callback === 'function') {
+      if (!validated.region) {
+        callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+      } else if (!validated.summoner) {
+        callback(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST), undefined)
+      } else {
+        parse.Runes(region, summoner, this.api_key)
+          .then((json) => {
+            callback(undefined, json)
+          })
+          .catch((error) => {
+            callback(error, undefined)
+          })
+      }
+    } else {
+      return new Promise((resolve, reject) => {
+          if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+          else if (!validated.summoner) reject(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
+          else resolve(parse.Runes(region, summoner, this.api_key))
+      })
+    }
+  }
+
+  Masteries(region, summoner, callback) {
+    let validated = {
+      region: validate.Region(region),
+      summoner: validate.Summoner(summoner)
+    }
+
+    if (typeof callback === 'function') {
+      if (!validated.region) {
+        callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+        return
+      } else if (!validated.summoner) {
+        callback(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST), undefined)
+        return
+      } else {
+        parse.Masteries(region, summoner, this.api_key)
+          .then((json) => {
+            callback(undefined, json)
+          })
+          .catch((error) => {
+            callback(error, undefined)
+          })
+      }
+    } else {
+      return new Promise((resolve, reject) => {
+          if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+          else if (!validated.summoner) reject(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
+          else resolve(parse.Masteries(region, summoner, this.api_key))
+      })
+    }
+  }
+
+  Matches(region, summoner, start, callback) {
+    let validated = {
+      region: validate.Region(region),
+      summoner: validate.Summoner(summoner),
+      start: validate.Timestamp(start)
+    }
+
+    if (typeof callback === 'function') {
+      if (!validated.region) {
+        callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+      } else if (!validated.summoner) {
+        callback(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST), undefined)
+      } else if (!!start && !validated.start) {
+        callback(new Error(errorMessages.INVALID_PARAM_TIMESTAMP, responseCodes.BAD_REQUEST), undefined)
+      } else {
+        if (!!start) {
+          parse.Matches(region, summoner, this.api_key)
+            .then((json) => {
+              callback(undefined, json)
+            })
+            .catch((error) => {
+              callback(error, undefined)
+            })
+        } else {
+          parse.MatchesByTimestamp(region, summoner, start, this.api_key)
+            .then((json) => {
+              callback(undefined, json)
+            })
+            .catch((error) => {
+              callback(error, undefined)
+            })
+        }
+      }
+    } else {
+      return new Promise((resolve, reject) => {
+          if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+          else if (!validated.summoner) reject(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
+          else if (!!start && !validated.start) reject(new Error(errorMessages.INVALID_PARAM_TIMESTAMP, responseCodes.BAD_REQUEST))
+          else {
+            if (!!start) {
+              resolve(parse.MatchesByTimestamp(region, summoner, start, this.api_key))
+            } else {
+              resolve(parse.Matches(region, summoner, this.api_key))
+            }
+          }
+      })
+    }
+  }
+
+  Match(region, gameId, summoner, callback) {
+    let validated = {
+      region: validate.Region(region),
+      summoner: validate.Summoner(summoner),
+      gameId: validate.GameId(gameId)
+    }
+
+    if (typeof callback === 'function') {
+      if (!validated.region) {
+        callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+      } else if (!validated.summoner) {
+        callback(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST), undefined)
+      } else if (!validated.gameId) {
+        callback(new Error(errorMessages.INVALID_PARAM_GAME_ID, responseCodes.BAD_REQUEST), undefined)
+      } else {
+        parse.Match(region, summoner, gameId, this.api_key)
+          .then((json) => {
+            callback(undefined, json)
+          })
+          .catch((error) => {
+            callback(error, undefined)
+          })
+      }
+    } else {
+      return new Promise((resolve, reject) => {
+          if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+          else if (!validated.summoner) reject(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
+          else if (!validated.gameId) reject(new Error(errorMessages.INVALID_PARAM_GAME_ID, responseCodes.BAD_REQUEST))
+          else resolve(parse.Match(region, summoner, gameId, this.api_key))
+      })
+    }
+  }
+
+  Stats(region, type, league, period, mapId, queue, callback) {
+    let validated = {
+      region: validate.Region(region),
+      type: validate.Summoner(summoner),
+      league: !!league && validate.StatsLeague(league),
+      period: !!period && validate.StatsPeriod(period),
+      mapId: !!mapId && validate.StatsMap(map),
+      queue: !!queue && validate.StatsQueueType(queue)
+    }
+
+    if (typeof callback === 'function') {
+      if (!validated.region) {
+        callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+      } else if (!validated.type) {
+        callback(new Error(errorMessages.INVALID_PARAM_STATS_GRAPH_TYPE, responseCodes.BAD_REQUEST), undefined)
+      } else if (!validated.league) {
+        callback(new Error(errorMessages.INVALID_PARAM_STATS_LEAGUE, responseCodes.BAD_REQUEST), undefined)
+      } else if (!validated.period) {
+        callback(new Error(errorMessages.INVALID_PARAM_STATS_PERIOD, responseCodes.BAD_REQUEST), undefined)
+      } else if (!validated.mapId) {
+        callback(new Error(errorMessages.INVALID_PARAM_STATS_MAP, responseCodes.BAD_REQUEST), undefined)
+      } else if (!validated.queue) {
+        callback(new Error(errorMessages.INVALID_PARAM_STATS_QUEUE, responseCodes.BAD_REQUEST), undefined)
+      } else {
+        parse.Masteries(region, summoner, this.api_key)
+          .then((json) => {
+            callback(undefined, json)
+          })
+          .catch((error) => {
+            callback(error, undefined)
+          })
+      }
+    } else {
+      return new Promise((resolve, reject) => {
+          if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+          else if (!validated.type) reject(new Error(errorMessages.INVALID_PARAM_STATS_GRAPH_TYPE, responseCodes.BAD_REQUEST))
+          else if (!validated.league) reject(new Error(errorMessages.INVALID_PARAM_STATS_LEAGUE, responseCodes.BAD_REQUEST))
+          else if (!validated.period) reject(new Error(errorMessages.INVALID_PARAM_STATS_PERIOD, responseCodes.BAD_REQUEST))
+          else if (!validated.mapId) reject(new Error(errorMessages.INVALID_PARAM_STATS_MAP, responseCodes.BAD_REQUEST))
+          else if (!validated.queue) reject(new Error(errorMessages.INVALID_PARAM_STATS_QUEUE, responseCodes.BAD_REQUEST))
+          else resolve(parse.Masteries(region, summoner, this.api_key))
+      })
+    }
+  }
+
+  Analytics(region, callback) {
+    let validated = validate.Region(region)
+
+    if (typeof callback === 'function') {
+      if (!validated) {
+        callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+      } else {
+        parse.Analytics(region, this.api_key)
+          .then((json) => {
+            callback(undefined, json)
+          })
+          .catch((error) => {
+            callback(error, undefined)
+          })
+      }
+    } else {
+      return new Promise((resolve, reject) => {
+          if (!validated) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+          else resolve(parse.Analytics(region, this.api_key))
+      })
+    }
+  }
+
+  AnalyticsByChampion(region, champion, role, callback) {
+    let validated = {
+        region: validate.Region(region),
+        champion: validate.ChampionName(champion),
+        role: validate.Role(role)
+      }
+
+    if (typeof callback === 'function') {
+        if (!validated.region) {
+          callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+        } else if (!validated.champion) {
+          callback(new Error(errorMessages.INVALID_PARAM_CHAMPION_NAME, responseCodes.BAD_REQUEST), undefined)
+        } else if (!validated.role) {
+          callback(new Error(errorMessages.INVALID_PARAM_ROLE, responseCodes.BAD_REQUEST), undefined)
+        } else {
+          parse.AnalyticsByChampion(region, champion, role, this.api_key)
+            .then((json) => {
+              callback(undefined, json)
+            })
+            .catch((error) => {
+              callback(error, undefined)
+            })
+        }
+    } else {
+        return new Promise((resolve, reject) => {
+            if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+            else if (!validated.champion) reject(new Error(errorMessages.INVALID_CHAMPION_NAME, responseCodes.BAD_REQUEST))
+            else if (!validated.role) reject(new Error(errorMessages.INVALID_PARAM_ROLE, responseCodes.BAD_REQUEST))
+            else resolve(parse.AnalyticsByChampion(region, champion, role, this.api_key))
+        })
+    }
+  }
+
+  AnalyticsByChampionItems(region, champion, role, callback) {
+    let validated = {
+        region: validate.Region(region),
+        champion: validate.ChampionName(champion),
+        role: validate.Role(role)
+      }
+
+    if (typeof callback === 'function') {
+        if (!validated.region) {
+          callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+        } else if (!validated.champion) {
+          callback(new Error(errorMessages.INVALID_PARAM_CHAMPION_NAME, responseCodes.BAD_REQUEST), undefined)
+        } else if (!validated.role) {
+          callback(new Error(errorMessages.INVALID_PARAM_ROLE, responseCodes.BAD_REQUEST), undefined)
+        } else {
+          parse.AnalyticsByChampionItems(region, champion, role, this.api_key)
+            .then((json) => {
+              callback(undefined, json)
+            })
+            .catch((error) => {
+              callback(error, undefined)
+            })
+        }
+    } else {
+        return new Promise((resolve, reject) => {
+            if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+            else if (!validated.champion) reject(new Error(errorMessages.INVALID_CHAMPION_NAME, responseCodes.BAD_REQUEST))
+            else if (!validated.role) reject(new Error(errorMessages.INVALID_PARAM_ROLE, responseCodes.BAD_REQUEST))
+            else resolve(parse.AnalyticsByChampionItems(region, champion, role, this.api_key))
+        })
+    }
+  }
+
+  AnalyticsByChampionSkills(region, champion, role, callback) {
+    let validated = {
+        region: validate.Region(region),
+        champion: validate.ChampionName(champion),
+        role: validate.Role(role)
+      }
+
+    if (typeof callback === 'function') {
+        if (!validated.region) {
+          callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+        } else if (!validated.champion) {
+          callback(new Error(errorMessages.INVALID_PARAM_CHAMPION_NAME, responseCodes.BAD_REQUEST), undefined)
+        } else if (!validated.role) {
+          callback(new Error(errorMessages.INVALID_PARAM_ROLE, responseCodes.BAD_REQUEST), undefined)
+        } else {
+          parse.AnalyticsByChampionSkills(region, champion, role, this.api_key)
+            .then((json) => {
+              callback(undefined, json)
+            })
+            .catch((error) => {
+              callback(error, undefined)
+            })
+        }
+    } else {
+        return new Promise((resolve, reject) => {
+            if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+            else if (!validated.champion) reject(new Error(errorMessages.INVALID_CHAMPION_NAME, responseCodes.BAD_REQUEST))
+            else if (!validated.role) reject(new Error(errorMessages.INVALID_PARAM_ROLE, responseCodes.BAD_REQUEST))
+            else resolve(parse.AnalyticsByChampionSkills(region, champion, role, this.api_key))
+        })
+    }
+  }
+
+  AnalyticsByChampionRunes(region, champion, role, callback) {
+    let validated = {
+        region: validate.Region(region),
+        champion: validate.ChampionName(champion),
+        role: validate.Role(role)
+      }
+
+    if (typeof callback === 'function') {
+        if (!validated.region) {
+          callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+        } else if (!validated.champion) {
+          callback(new Error(errorMessages.INVALID_PARAM_CHAMPION_NAME, responseCodes.BAD_REQUEST), undefined)
+        } else if (!validated.role) {
+          callback(new Error(errorMessages.INVALID_PARAM_ROLE, responseCodes.BAD_REQUEST), undefined)
+        } else {
+          parse.AnalyticsByChampionRunes(region, champion, role, this.api_key)
+            .then((json) => {
+              callback(undefined, json)
+            })
+            .catch((error) => {
+              callback(error, undefined)
+            })
+        }
+    } else {
+        return new Promise((resolve, reject) => {
+            if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+            else if (!validated.champion) reject(new Error(errorMessages.INVALID_CHAMPION_NAME, responseCodes.BAD_REQUEST))
+            else if (!validated.role) reject(new Error(errorMessages.INVALID_PARAM_ROLE, responseCodes.BAD_REQUEST))
+            else resolve(parse.AnalyticsByChampionRunes(region, champion, role, this.api_key))
+        })
+    }
+  }
+
+  AnalyticsByChampionMasteries(region, champion, role, callback) {
+    let validated = {
+        region: validate.Region(region),
+        champion: validate.ChampionName(champion),
+        role: validate.Role(role)
+      }
+
+    if (typeof callback === 'function') {
+        if (!validated.region) {
+          callback(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST), undefined)
+        } else if (!validated.champion) {
+          callback(new Error(errorMessages.INVALID_PARAM_CHAMPION_NAME, responseCodes.BAD_REQUEST), undefined)
+        } else if (!validated.role) {
+          callback(new Error(errorMessages.INVALID_PARAM_ROLE, responseCodes.BAD_REQUEST), undefined)
+        } else {
+          parse.AnalyticsByChampionMasteries(region, champion, role, this.api_key)
+            .then((json) => {
+              callback(undefined, json)
+            })
+            .catch((error) => {
+              callback(error, undefined)
+            })
+        }
+    } else {
+        return new Promise((resolve, reject) => {
+            if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+            else if (!validated.champion) reject(new Error(errorMessages.INVALID_CHAMPION_NAME, responseCodes.BAD_REQUEST))
+            else if (!validated.role) reject(new Error(errorMessages.INVALID_PARAM_ROLE, responseCodes.BAD_REQUEST))
+            else resolve(parse.AnalyticsByChampionMasteries(region, champion, role, this.api_key))
+        })
+    }
+  }
+}
