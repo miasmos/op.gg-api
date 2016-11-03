@@ -6,12 +6,37 @@ Serves op.gg web pages as json.
 Getting Started  
 ==========  
 ```
-npm install
+npm install op.gg-api
 ```  
-  
+
+Example  
+==========  
+
+Using the client
+```
+var gg = new (require('node_modules/op.gg-api/client.js'))
+
+gg.Live('kr')
+	.then((json) => {
+		console.log(json)
+	})
+	.catch((error) => {
+		console.error(error)
+	})
+
+gg.Live('kr', function(error, data) {
+	console.log(error || data)
+})
+```
+
+Using the server
+```
+node node_modules/op.gg-api/server
+```
+
 Endpoints
 ==========
-v2.0 documentation currently in progress.
+v2.0 documentation currently in progress. For now, refer to server.js for endpoints and tests_spec.js for models.
   
 Licence  
 ==========  
