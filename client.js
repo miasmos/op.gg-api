@@ -91,7 +91,7 @@ module.exports = class opgg {
       return new Promise((resolve, reject) => {
           if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
           else if (!validated.summoner) reject(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
-          else resolve(parse.Renew(region, summonerId, this.api_key))
+          else resolve(parse.SummaryCombined(region, summoner, this.api_key))
       })
     }
   }
@@ -217,7 +217,7 @@ module.exports = class opgg {
   Runes(region, summoner, callback) {
     let validated = {
       region: validate.Region(region),
-      summoner: validate.SummonerName(summoner)
+      summoner: validate.Summoner(summoner)
     }
 
     if (typeof callback === 'function') {
