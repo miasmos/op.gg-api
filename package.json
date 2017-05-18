@@ -1,6 +1,6 @@
 {
   "name": "op.gg-api",
-  "version": "2.0.4-alpha",
+  "version": "2.0.5-alpha",
   "description": "Parses live op.gg pages into json endpoints",
   "main": "server.js",
   "dependencies": {
