@@ -1,3 +1,5 @@
+This repository is no longer maintained.
+
 op.gg-api
 =========
 Serves op.gg web pages as json.
