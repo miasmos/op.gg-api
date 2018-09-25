@@ -362,7 +362,7 @@ module.exports = class opgg {
       type: validate.Summoner(summoner),
       league: !!league && validate.StatsLeague(league),
       period: !!period && validate.StatsPeriod(period),
-      mapId: !!mapId && validate.StatsMap(map),
+      mapId: !!mapId && validate.StatsMap(mapId),
       queue: !!queue && validate.StatsQueueType(queue)
     }
 
@@ -380,7 +380,7 @@ module.exports = class opgg {
       } else if (!validated.queue) {
         callback(new Error(errorMessages.INVALID_PARAM_STATS_QUEUE, responseCodes.BAD_REQUEST), undefined)
       } else {
-        parse.Masteries(region, summoner, this.api_key)
+        parse.Stats(region, type, league, period, mapId, queue, this.api_key)
           .then((json) => {
             callback(undefined, json)
           })
@@ -396,7 +396,7 @@ module.exports = class opgg {
           else if (!validated.period) reject(new Error(errorMessages.INVALID_PARAM_STATS_PERIOD, responseCodes.BAD_REQUEST))
           else if (!validated.mapId) reject(new Error(errorMessages.INVALID_PARAM_STATS_MAP, responseCodes.BAD_REQUEST))
           else if (!validated.queue) reject(new Error(errorMessages.INVALID_PARAM_STATS_QUEUE, responseCodes.BAD_REQUEST))
-          else resolve(parse.Masteries(region, summoner, this.api_key))
+          else resolve(parse.Stats(region, type, league, period, mapId, queue, this.api_key))
       })
     }
   }
