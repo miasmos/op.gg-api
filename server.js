@@ -1,18 +1,19 @@
 'use strict'
-let express = require('express');
-let http = require('http');
-let parse = require('./lib/Parser/Parser');
-let validate = require('./lib/validate');
-let response = require('./lib/Responses/Response');
-let utils = require('./lib/utils');
-let Error = require('./lib/Responses/Error');
-let errorMessages = require('./lib/Responses/error_messages.json');
-let responseCodes = require('./lib/Responses/response_codes.json');
-let fs = require('fs');
 
 const OPGG_CLIENT_SERVER_PORT = 1337;
 
 const startServer = () => {
+	let express = require('./node_modules/express');
+	let http = require('http');
+	let parse = require('./lib/Parser/Parser');
+	let validate = require('./lib/validate');
+	let response = require('./lib/Responses/Response');
+	let utils = require('./lib/utils');
+	let Error = require('./lib/Responses/Error');
+	let errorMessages = require('./lib/Responses/error_messages.json');
+	let responseCodes = require('./lib/Responses/response_codes.json');
+	let fs = require('fs');
+
 	return new Promise((resolve, reject) => {
 		const app = express()
 
