@@ -8,6 +8,6 @@ gg.Live('kr')
 		console.error(error)
 	})
 
-gg.Live('kr', function(error, data) {
+gg.Live('kr', function (error, data) {
 	console.log(error || data)
 })

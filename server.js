@@ -13,51 +13,51 @@ let express = require('express'),
 
 app.set('json spaces', 4)
 
-app.param('region', (req,res,next,id) => {
-  if (!validate.Region(req.params.region)) {
-    response.Error(res, new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
-    return
-  }
-  next()
-})
-
-app.param('summoner', (req,res,next,id) => {
-  if (!validate.Summoner(req.params.summoner)) {
-    response.Error(res, new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
-    return
-  }
-  next()
-})
-
-app.param('gamenum', (req,res,next,id) => {
-  if (!validate.GameId(req.params.gamenum)) {
-    response.Error(res, new Error(errorMessages.INVALID_PARAM_GAME_ID, responseCodes.BAD_REQUEST))
-    return
-  }
+app.param('region', (req, res, next, id) => {
+	if (!validate.Region(req.params.region)) {
+		response.Error(res, new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+		return
+	}
 	next()
 })
 
-app.param('summonerId', (req,res,next,id) => {
-  if (!validate.SummonerId(req.params.summonerId)) {
-    response.Error(res, new Error(errorMessages.INVALID_PARAM_SUMMONER_ID, responseCodes.BAD_REQUEST))
-    return
-  }
+app.param('summoner', (req, res, next, id) => {
+	if (!validate.Summoner(req.params.summoner)) {
+		response.Error(res, new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
+		return
+	}
 	next()
 })
 
-app.param('season', (req,res,next,id) => {
-  if (!validate.Season(req.params.season)) {
-    response.Error(res, new Error(errorMessages.INVALID_PARAM_SEASON, responseCodes.BAD_REQUEST))
-    return
-  }
+app.param('gamenum', (req, res, next, id) => {
+	if (!validate.GameId(req.params.gamenum)) {
+		response.Error(res, new Error(errorMessages.INVALID_PARAM_GAME_ID, responseCodes.BAD_REQUEST))
+		return
+	}
 	next()
 })
 
-app.param('timestamp', (req,res,next,id) => {
-  if (!validate.Timestamp(req.params.timestamp)) {
-    response.Error(res, new Error(errorMessages.INVALID_PARAM_TIMESTAMP, responseCodes.BAD_REQUEST))
-    return
-  }
+app.param('summonerId', (req, res, next, id) => {
+	if (!validate.SummonerId(req.params.summonerId)) {
+		response.Error(res, new Error(errorMessages.INVALID_PARAM_SUMMONER_ID, responseCodes.BAD_REQUEST))
+		return
+	}
+	next()
+})
+
+app.param('season', (req, res, next, id) => {
+	if (!validate.Season(req.params.season)) {
+		response.Error(res, new Error(errorMessages.INVALID_PARAM_SEASON, responseCodes.BAD_REQUEST))
+		return
+	}
+	next()
+})
+
+app.param('timestamp', (req, res, next, id) => {
+	if (!validate.Timestamp(req.params.timestamp)) {
+		response.Error(res, new Error(errorMessages.INVALID_PARAM_TIMESTAMP, responseCodes.BAD_REQUEST))
+		return
+	}
 	next()
 })
 
@@ -155,7 +155,7 @@ app.use((req, res, next) => {
 	next()
 })
 
-app.get('/:region/live', (req,res) => {
+app.get('/:region/live', (req, res) => {
 	parse.Live(req.params.region, req.query.api_key)
 		.then((data) => {
 			response.Ok(res, data)
@@ -165,7 +165,7 @@ app.get('/:region/live', (req,res) => {
 		})
 })
 
-app.get('/:region/renew', (req,res) => {
+app.get('/:region/renew', (req, res) => {
 	parse.Renew(req.params.region, req.query.summonerId)
 		.then((data) => {
 			response.Ok(res, data)
@@ -177,7 +177,7 @@ app.get('/:region/renew', (req,res) => {
 
 app.get('/:region/summary/:summoner', SummaryCombined)
 app.get('/:region/summary/:summoner/combined', SummaryCombined)
-function SummaryCombined(req,res) {
+function SummaryCombined(req, res) {
 	return parse.SummaryCombined(req.params.region, req.params.summoner)
 		.then((data) => {
 			response.Ok(res, data)
@@ -187,7 +187,7 @@ function SummaryCombined(req,res) {
 		})
 }
 
-app.get('/:region/summary/:summoner/ranked', (req,res) => {
+app.get('/:region/summary/:summoner/ranked', (req, res) => {
 	parse.SummaryRanked(req.params.region, req.params.summoner)
 		.then((data) => {
 			response.Ok(res, data)
@@ -197,7 +197,7 @@ app.get('/:region/summary/:summoner/ranked', (req,res) => {
 		})
 })
 
-app.get('/:region/summary/:summoner/normal', (req,res) => {
+app.get('/:region/summary/:summoner/normal', (req, res) => {
 	parse.SummaryNormal(req.params.region, req.params.summoner)
 		.then((data) => {
 			response.Ok(res, data)
@@ -207,7 +207,7 @@ app.get('/:region/summary/:summoner/normal', (req,res) => {
 		})
 })
 
-app.get('/:region/champions/:summoner', (req,res) => {
+app.get('/:region/champions/:summoner', (req, res) => {
 	return parse.Champions(req.params.region, req.params.summoner, req.query.season ? req.query.season : 6)
 		.then((data) => {
 			response.Ok(res, data)
@@ -217,7 +217,7 @@ app.get('/:region/champions/:summoner', (req,res) => {
 		})
 })
 
-app.get('/:region/league/:summoner', (req,res) => {
+app.get('/:region/league/:summoner', (req, res) => {
 	return parse.League(req.params.region, req.params.summoner)
 		.then((data) => {
 			response.Ok(res, data)
@@ -250,12 +250,12 @@ app.get('/:region/masteries/:summoner/', (req, res) => {
 app.get('/:region/matches/:summoner/', (req, res) => {
 	if ('start' in req.query) {
 		return parse.MatchesByTimestamp(req.params.region, req.params.summoner, req.query.start)
-		.then((data) => {
-			response.Ok(res, data)
-		})
-		.catch((error) => {
-			response.Error(res, error)
-		})
+			.then((data) => {
+				response.Ok(res, data)
+			})
+			.catch((error) => {
+				response.Error(res, error)
+			})
 	} else {
 		return parse.Matches(req.params.region, req.params.summoner)
 			.then((data) => {
@@ -264,10 +264,10 @@ app.get('/:region/matches/:summoner/', (req, res) => {
 			.catch((error) => {
 				response.Error(res, error)
 			})
-		}
+	}
 })
 
-app.get('/:region/match/:gameId/', (req,res) => {
+app.get('/:region/match/:gameId/', (req, res) => {
 	return parse.Match(req.params.region, req.query.summoner, req.params.gameId)
 		.then((data) => {
 			response.Ok(res, data)
@@ -351,6 +351,6 @@ app.get('*', (req, res) => {
 	response.Error(res, new Error(errorMessages.NOT_FOUND, responseCodes.NOT_FOUND))
 })
 
-http.createServer(app).listen(1337, function() {
-  console.log('Listening on port 1337')
+http.createServer(app).listen(1337, function () {
+	console.log('Listening on port 1337')
 })
