@@ -67,6 +67,20 @@ module.exports = class opgg {
     }
   }
 
+  SummonerStats(region, summoner) {
+    console.log(`Fetching summoner stats for '${summoner}'`);
+    let validated = {
+      region: validate.Region(region),
+      summoner: validate.Summoner(summoner)
+    };
+
+    return new Promise((resolve, reject) => {
+      if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+      else if (!validated.summoner) reject(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
+      else resolve(parse.SummonerStats(region, summoner, this.api_key))
+    });
+  }
+
   Summary(region, summoner, callback) {
     let validated = {
       region: validate.Region(region),
