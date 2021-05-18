@@ -8,6 +8,7 @@
     "cheerio": "^0.22.0",
     "express": "^4.14.0",
     "leagueapi": "^0.4.21",
+    "node-fetch": "^2.6.1",
     "relaxed-json": "^1.0.0",
     "request": "^2.75.0",
     "request-promise": "^4.1.1"
