@@ -6,7 +6,7 @@ let parse = require('./lib/Parser/Parser'),
   validate = require('./lib/validate'),
   Promise = require('bluebird'),
   fetch = require('node-fetch')
-
+const {OPGG_CLIENT_SERVER_PORT} = require('./server');
 
 module.exports = class opgg {
   constructor(opts) {
@@ -76,9 +76,9 @@ module.exports = class opgg {
 
       if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
       else if (!validated.summoner) reject(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
-      else fetch(`http://localhost:1337/${region}/stats/${summoner}`)
+      else fetch(`http://localhost:${OPGG_CLIENT_SERVER_PORT}/${region}/stats/${summoner}`)
         .then(res => res.json())
-        .then(resolve)
+        .then(res => resolve(res.data))
         .catch(reject);
     });
   }

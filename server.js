@@ -375,4 +375,4 @@ const startServer = () => {
 	});
 }
 
-module.exports = {startServer};
+module.exports = {startServer, OPGG_CLIENT_SERVER_PORT};
