@@ -3,11 +3,9 @@ let parse = require('./lib/Parser/Parser'),
   errorMessages = require('./lib/Responses/error_messages.json'),
   responseCodes = require('./lib/Responses/response_codes.json'),
   Error = require('./lib/Responses/Error'),
-  response = require('./lib/Responses/Response'),
   validate = require('./lib/validate'),
   Promise = require('bluebird'),
-  fetch = require('node-fetch'),
-  {startServer} = require('./server')
+  fetch = require('node-fetch')
 
 
 module.exports = class opgg {
@@ -15,10 +13,6 @@ module.exports = class opgg {
     if (!opts) opts = {}
     this.api_key = opts.api_key ? opts.api_key : undefined
     if (!!this.api_key && !validate.RiotAPIKey(this.api_key)) throw new Error(error.INVALID_API_KEY)
-
-    this.serverPromise = startServer()
-      .then(server => this.server = server)
-      .catch(console.error);
   }
 
   Live(region, callback) {
@@ -75,19 +69,17 @@ module.exports = class opgg {
 
   SummonerStats(region, summoner) {
     return new Promise((resolve, reject) => {
-      this.serverPromise.then(() => {
-        let validated = {
-          region: validate.Region(region),
-          summoner: validate.Summoner(summoner)
-        };
+      let validated = {
+        region: validate.Region(region),
+        summoner: validate.Summoner(summoner)
+      };
 
-        if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
-        else if (!validated.summoner) reject(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
-        else fetch(`http://localhost:1337/${region}/stats/${summoner}`)
-          .then(res => res.json())
-          .then(resolve)
-          .catch(reject);
-      });
+      if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
+      else if (!validated.summoner) reject(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
+      else fetch(`http://localhost:1337/${region}/stats/${summoner}`)
+        .then(res => res.json())
+        .then(resolve)
+        .catch(reject);
     });
   }
 

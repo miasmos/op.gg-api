@@ -3,7 +3,8 @@
 const OPGG_CLIENT_SERVER_PORT = 1337;
 
 const startServer = () => {
-	let express = require('./node_modules/express');
+	let express = require('express');
+	let cors = require('cors');
 	let http = require('http');
 	let parse = require('./lib/Parser/Parser');
 	let validate = require('./lib/validate');
@@ -16,6 +17,7 @@ const startServer = () => {
 
 	return new Promise((resolve, reject) => {
 		const app = express()
+		app.use(cors());
 
 		app.set('json spaces', 4)
 
