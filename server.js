@@ -1,6 +1,6 @@
 'use strict'
 
-const OPGG_CLIENT_SERVER_PORT = 1337;
+const OPGG_CLIENT_SERVER_PORT = 2424;
 
 const startServer = () => {
 	let express = require('express');
