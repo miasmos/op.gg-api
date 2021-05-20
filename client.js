@@ -6,13 +6,13 @@ let parse = require('./lib/Parser/Parser'),
   validate = require('./lib/validate'),
   Promise = require('bluebird'),
   fetch = require('node-fetch')
-const {OPGG_CLIENT_SERVER_PORT} = require('./server');
 
 module.exports = class opgg {
   constructor(opts) {
     if (!opts) opts = {}
     this.api_key = opts.api_key ? opts.api_key : undefined
     if (!!this.api_key && !validate.RiotAPIKey(this.api_key)) throw new Error(error.INVALID_API_KEY)
+    this.opggApiServerPort = opts.opggApiServerPort
   }
 
   Live(region, callback) {
@@ -76,7 +76,7 @@ module.exports = class opgg {
 
       if (!validated.region) reject(new Error(errorMessages.INVALID_PARAM_REGION, responseCodes.BAD_REQUEST))
       else if (!validated.summoner) reject(new Error(errorMessages.INVALID_PARAM_SUMMONER_NAME, responseCodes.BAD_REQUEST))
-      else fetch(`http://localhost:${OPGG_CLIENT_SERVER_PORT}/${region}/stats/${summoner}`)
+      else fetch(`http://localhost:${this.opggApiServerPort}/${region}/stats/${summoner}`)
         .then(res => res.json())
         .then(res => resolve(res.data))
         .catch(reject);

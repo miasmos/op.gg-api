@@ -1,8 +1,8 @@
 'use strict'
 
-const OPGG_CLIENT_SERVER_PORT = 2424;
+const DEFAULT_OPGG_CLIENT_SERVER_PORT = 2424;
 
-const startServer = () => {
+const startServer = (port = DEFAULT_OPGG_CLIENT_SERVER_PORT) => {
 	let express = require('express');
 	let cors = require('cors');
 	let http = require('http');
@@ -369,10 +369,10 @@ const startServer = () => {
 			response.Error(res, new Error(errorMessages.NOT_FOUND, responseCodes.NOT_FOUND))
 		})
 
-		const server = http.createServer(app).listen(OPGG_CLIENT_SERVER_PORT, () => {
+		const server = http.createServer(app).listen(port, () => {
 			resolve(server);
 		});
 	});
 }
 
-module.exports = {startServer, OPGG_CLIENT_SERVER_PORT};
+module.exports = {startServer, DEFAULT_OPGG_CLIENT_SERVER_PORT};
