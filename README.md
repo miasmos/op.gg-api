@@ -1,5 +1,10 @@
 # op.gg-api
 
+[![npm version](https://badge.fury.io/js/op.gg-api.svg)](https://badge.fury.io/js/op.gg-api)
+[![Known Vulnerabilities](https://snyk.io/test/github/stephenpoole/op.gg-api/badge.svg)](https://snyk.io/test/github/stephenpoole/op.gg-api)
+[![Build Status](https://travis-ci.com/stephenpoole/op.gg-api.svg?branch=master)](https://travis-ci.com/stephenpoole/op.gg-api)
+[![codecov](https://codecov.io/gh/stephenpoole/op.gg-api/branch/master/graph/badge.svg?token=vlj5CxCF2a)](https://codecov.io/gh/stephenpoole/op.gg-api)
+
 Serves op.gg web pages as json.
 
 Getting Started  
@@ -8,8 +13,7 @@ Getting Started
 or
 `yarn add op.gg-api`
 
-Example  
-==========
+# Example
 
 Initialize
 
