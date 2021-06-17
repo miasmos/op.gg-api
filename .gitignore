@@ -1,2 +1,27 @@
+# Logs
+logs
+*.log
+
+# transpiled code
+build
+
+# Dependency directories
 node_modules
-credentials.json
+
+# Typescript v1 declaration files
+typings/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+dist
+coverage
+.nyc_output
+docs

@@ -1,0 +1,36 @@
+language: node_js
+node_js:
+  - "10"
+cache:
+  directories:
+    - node_modules
+deploy:
+  - provider: npm
+    email: stephenwpoole@gmail.com
+    api_key:
+      secure: b9q3XjgSfva16y6/Pusf+gPloOuDVuePWrOOobBvCZZfAwOpLAkisrkMEPn/ulJFIsL+3gvel+1i7+fM0WG6u2b7kTCdnbH4AmZOT13IHrvkfpzC4OXLiXZKARU4Dfm6A+mBhXSiES2ju8os1Qabm+inUFegKqCoX8eUdOaI65RqJGhUsFeElu4Wy5LfQVz0XQuFOlqPO8vXxG4JsSn39j57wcK+/IG3Yia9i8AY1GdzTmbFFZSuLRYWnQaNsAXegyHzMtdr9KFR4XH2j8ELBqyOuU+TKD1JfiHOw/WX7cWAXnYoZORvvIH7Q20bv0UwlUFrvSZ+GiZb6+CXn5AR7PZ76nIDhI28O18GhkrJLlrjqoMJLKo43I7m0tzF2QnbGn4hDAzHFIqBiVgimjmn+kERlad2gKIVlh6riBjUH+QpF8i56xBKPkleU0kEnszPhVBul8/1Uc/JApLwYtXVRBjPgFua8dxzhoO2t91rVGMrtStL4AnLefQmrFBL86lBz4nAO5aH5FGa4kDXIAp6Tjc1mc4v5jj8iu07lkFHrg2+nXkh2Ib/p2fl7YLQ4cp9pL1QBPKKxwQahhShI2AdlJljAS2iLQ8b11123JVseOO4SgqxgxA/sA9Q1MixU6v5PHAAMHadhCaLMzCnQq6cMG27c3HZPrKZAQlO8uCiBxw=
+    on:
+      branch: master
+      tags: true
+      repo: stephenpoole/op.gg-api
+  - provider: pages
+    skip_cleanup: true
+    github_token: $GITHUB_TOKEN
+    keep_history: true
+    local_dir: docs
+    repo: stephenpoole/stephenpoole.github.io
+    target_branch: master
+    on:
+      branch: master
+script:
+  - npm install codecov -g
+  - npm install
+  - npm test
+  - npm start
+env:
+  global:
+    secure: P703tbf/CRlRP2sBeUCAUFQEEC2LjYvjeeYkwCmVxJDNX4jx9ZEqTEOgs4YkpAKuKje45DPSBkLKFDllSqkFThjhbQUpwV+d5NG8KOBYhwVReG4zmR8WtYu56EHkds2YEtcAp18VpF4+w6sjwoZbt0EtatSz9BW9ABKyp/DbcB4d5J/ktm5HZcXsAReRS58ZgfqFI/9gtGTbB3/aa3iRIkfBXuFqNdLSf2QKL3bl3irKxiVrB4MaPRA8ojKidqTkwIfhBgbWqPUh3vL4+Qhct3SX5qOB89Ypu1k/OMGlubQ6Ac8Nk5WiTAZqAlhtNIWeMb0bjlM8UNjevbFDAQHKLnQZo3nnsW7UIi1lqSxLcY0nex5g5W+N2kNGgYU90ff9p9K9VGNA3MBh7TPlA45gb42N+l0LHOqXQt8cKRUwtILghcmV7jMbulE6JTTaf5avP6AA28UY6n0FXvSy7qrJ/jSAHSaGMdjruOzOcZ/e4OYoPotylccA2Y0Aml5es9NX/1HF1HSx5QLPi/Tj5DAAgvYT139K5mRdY5qX5M5lY9OJg2iT6xf4STD7yb6g2h75lcN70+PFWW802y5mLfSAqJQTZuHZyRY+XUzcTUHoyFn6cF86IflpC1I4vg7Y7b9yxCmzkYfwbaM2LCVhs4dVv29M0ZYJiY/iBOtKrkHO0k8=
+after_success:
+  - nyc --reporter=lcov npm test && codecov -t $CODECOV_TOKEN
+notifications:
+  slack: poolestephen:yXON26JW04kWilhEQ3VxQOPM

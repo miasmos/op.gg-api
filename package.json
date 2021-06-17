@@ -1,45 +1,76 @@
 {
-  "name": "op.gg-api",
-  "version": "2.0.5-alpha",
-  "description": "Parses live op.gg pages into json endpoints",
-  "main": "server.js",
-  "dependencies": {
-    "bluebird": "^3.4.6",
-    "cheerio": "^0.22.0",
-    "express": "^4.17.1",
-    "leagueapi": "^0.4.21",
-    "node-fetch": "^2.6.1",
-    "relaxed-json": "^1.0.0",
-    "request": "^2.75.0",
-    "request-promise": "^4.1.1",
-    "cors": "^2.8.5"
-  },
-  "devDependencies": {
-    "frisby": "^0.8.5"
-  },
-  "scripts": {
-    "test": "jasmine-node tests_spec.js",
-    "start": "node server.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://stephenpoole@github.com/stephenpoole/op.gg-api.git"
-  },
-  "keywords": [
-    "op.gg",
-    "league",
-    "of",
-    "legends",
-    "api",
-    "op",
-    "gg",
-    "opgg",
-    "summoner"
-  ],
-  "author": "Stephen Poole",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/stephenpoole/op.gg-api/issues"
-  },
-  "homepage": "https://github.com/stephenpoole/op.gg-api#readme"
+    "name": "op.gg-api",
+    "version": "3.0.0",
+    "description": "Parses live op.gg pages into json endpoints",
+    "main": "src/index.js",
+    "scripts": {
+        "start": "npm run prod",
+        "prod": "webpack --mode=production && npm run docs",
+        "dev": "webpack -w --mode=development",
+        "test": "snyk test && nyc mocha --file ./test/setup.js -r ts-node/register test/**/*.spec.js",
+        "coverage": "nyc --reporter=lcov npm test",
+        "snyk-protect": "snyk protect",
+        "prepare": "yarn run snyk-protect",
+        "docs": "typedoc --excludeExternals --externalPattern \"**/node_modules/**\" --ignoreCompilerErrors --name \"op.gg-api\" --mode \"file\" --out \"docs/op.gg-api\" \"src\""
+    },
+    "dependencies": {
+        "axios": "^0.21.1",
+        "cheerio": "^0.22.0",
+        "leaguejs": "^2.1.3"
+    },
+    "devDependencies": {
+        "@istanbuljs/nyc-config-typescript": "^1.0.1",
+        "@types/chai": "^4.2.18",
+        "@types/mocha": "^8.2.2",
+        "@types/moxios": "^0.4.11",
+        "@types/node": "^15.12.2",
+        "@types/webpack": "^5.28.0",
+        "@types/webpack-env": "^1.16.0",
+        "@typescript-eslint/eslint-plugin": "^4.27.0",
+        "@typescript-eslint/parser": "^4.27.0",
+        "awesome-typescript-loader": "^5.2.1",
+        "chai": "^4.3.4",
+        "circular-dependency-plugin": "^5.2.2",
+        "codecov": "^3.8.2",
+        "cross-env": "^7.0.3",
+        "dotenv-webpack": "^7.0.3",
+        "eslint": "^7.28.0",
+        "eslint-config-airbnb-base": "^14.2.1",
+        "eslint-loader": "^4.0.2",
+        "eslint-plugin-import": "^2.23.4",
+        "mocha": "^9.0.0",
+        "moxios": "^0.4.0",
+        "nyc": "^15.1.0",
+        "snyk": "^1.639.0",
+        "source-map": "^0.7.3",
+        "source-map-loader": "^3.0.0",
+        "source-map-support": "^0.5.19",
+        "ts-node": "^10.0.0",
+        "typedoc": "^0.20.37",
+        "typescript": "^4.3.3",
+        "webpack": "^5.39.1",
+        "webpack-cli": "^4.7.2",
+        "webpack-node-externals": "^3.0.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://stephenpoole@github.com/stephenpoole/op.gg-api.git"
+    },
+    "keywords": [
+        "op.gg",
+        "league",
+        "of",
+        "legends",
+        "api",
+        "op",
+        "gg",
+        "opgg",
+        "summoner"
+    ],
+    "author": "Stephen Poole",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/stephenpoole/op.gg-api/issues"
+    },
+    "homepage": "https://github.com/stephenpoole/op.gg-api#readme"
 }
