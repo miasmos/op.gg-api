@@ -6,11 +6,13 @@
   "dependencies": {
     "bluebird": "^3.4.6",
     "cheerio": "^0.22.0",
-    "express": "^4.14.0",
+    "express": "^4.17.1",
     "leagueapi": "^0.4.21",
+    "node-fetch": "^2.6.1",
     "relaxed-json": "^1.0.0",
     "request": "^2.75.0",
-    "request-promise": "^4.1.1"
+    "request-promise": "^4.1.1",
+    "cors": "^2.8.5"
   },
   "devDependencies": {
     "frisby": "^0.8.5"
