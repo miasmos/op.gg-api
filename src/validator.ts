@@ -1,4 +1,4 @@
-class Validate {
+class Validator {
     static region(region) {
         return (
             ["kr", "na", "euw", "eune", "oce", "br", "ru", "las", "lan", "tr"].indexOf(region) > -1
@@ -21,10 +21,10 @@ class Validate {
         return !!season && ((season >= 1 && season <= 7) || season == "normal");
     }
 
-    static riotAPIKey(key) {
-        var regex = new RegExp(/[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}/g);
-        regex = regex.exec(key);
-        return !!regex && regex.length;
+    static apiKey(key) {
+        const [result] =
+            key.match(/RGAPI-[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}/g) || [];
+        return result && result.length > 0;
     }
 
     static timestamp(timestamp) {
@@ -61,10 +61,9 @@ class Validate {
     }
 
     static championName(name) {
-        var regex = new RegExp(/^[a-zA-Z ']+$/g);
-        regex = regex.exec(name);
-        return !!regex && regex.length;
+        const [result] = name.match(/^[a-zA-Z ']+$/g) || [];
+        return result && result.length > 0;
     }
 }
 
-export default Validate;
+export default Validator;

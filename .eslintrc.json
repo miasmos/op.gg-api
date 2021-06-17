@@ -16,6 +16,7 @@
         "implicit-arrow-linebreak": 0,
         "import/extensions": 0,
         "quotes": 0,
+        "linebreak-style": ["error", "windows"],
         "function-paren-newline": 0,
         "no-underscore-dangle": 0,
         "arrow-parens": 0,
